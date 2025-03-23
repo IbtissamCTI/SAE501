@@ -1,0 +1,29 @@
+body {
+    background-color: #F0FAFF;
+}
+
+h1 {
+    font-size: 125px;
+    font-weight: bold;
+}
+
+.carre-blanc {
+    width: 250px; 
+    height: 500px; 
+    background-color: white; 
+    border-radius: 20px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative; 
+}
+
+.contenu {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#date {
+    display: flex;
+    align-items: center;
+   
+    gap: 10px; 
+}

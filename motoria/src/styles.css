@@ -1,0 +1,3 @@
+.component-wrapper {
+    min-height: 100px; /* Force une hauteur minimale */
+  }

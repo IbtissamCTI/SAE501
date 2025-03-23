@@ -1,0 +1,31 @@
+
+      <link rel="stylesheet" href="/motoria/src/app/component/header/header.component.css">
+
+    <nav class="navbar" [class.scrolled]="isScrolled">
+      <div class="navbar-container">
+        <a href="#"><img src="/assets/images/logomotoria.png" alt="Logo" routerLink="/Accueil" style="max-width: 100px;">
+        </a>
+            <p>Motoria</p>
+ 
+          <div class="nav-links">
+              <a href="#about">Mon Profil</a>
+              <a href="#about">Examen</a>
+              <a href="#services">Formules</a>
+              <a href="#contact">A propos</a>
+              <a routerLink="/accueilConnexion">Se connecter</a>
+          </div>  
+      </div>
+  </nav>
+  <script>
+    const navbar = document.querySelector('.navbar');
+    
+    // Scroll handler
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    })
+    ;</script>
+

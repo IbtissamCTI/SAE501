@@ -1,0 +1,61 @@
+<div class="container mt-5">
+    <h1 class="mb-4">Gestion des Élèves</h1>
+  
+    <!-- Formulaire d'ajout -->
+    <form (ngSubmit)="addUser()" #userForm="ngForm">
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" class="form-control" [(ngModel)]="newUser.nom" name="nom" required>
+        </div>
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" class="form-control" [(ngModel)]="newUser.prenom" name="prenom" required>
+        </div>
+        <div class="form-group">
+          <label>Date de naissance</label>
+          <input type="date" class="form-control" [(ngModel)]="newUser.birthdate" name="birthdate" required>
+        </div>
+        <div class="form-group">
+          <label>Etg</label>
+          <input type="text" class="form-control" [(ngModel)]="newUser.etg" name="etg" required>
+        </div>
+        <div class="form-group">
+          <label>Numéro NEPH</label>
+          <input type="text" class="form-control" [(ngModel)]="newUser.neph" name="neph" required>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" class="form-control" [(ngModel)]="newUser.psswrd" name="psswrd" required>
+        </div>
+        <div class="form-group">
+          <label>ID de l'école</label>
+          <input type="number" class="form-control" [(ngModel)]="newUser.id_ecole" name="id_ecole" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Ajouter</button>
+      </form>
+    
+    <!-- Tableau des élèves -->
+    <table class="table mt-4">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>id_eleve</th>
+          <th>etg</th>
+          <th>neph</th>
+
+
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.nom }}</td>
+          <td>{{ user.prenom }}</td>
+          <td>{{ user.id_eleve }}</td>
+          <td>{{ user.etg }}</td>
+          <td>{{ user.neph }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
