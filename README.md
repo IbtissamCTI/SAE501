@@ -1,1 +1,62 @@
-# SAE401
+# EasyToDrive - Plateforme de Formation au Permis de Conduire
+
+## Présentation de l'entreprise
+
+**EasyToDrive** est une entreprise de 70 salariés spécialisée dans la conception, le développement et la commercialisation de supports pédagogiques imprimés et digitaux pour la formation aux différentes catégories de permis de conduire (scooter ou voiturette, voiture, moto, remorque, bateau).
+
+Elle propose une plateforme **Easy2Drive.fr** à laquelle sont abonnées environ 6 000 auto-écoles réparties sur le territoire français et utilisée par plus de 500 000 élèves.
+
+---
+
+## Technologies Utilisées
+
+- **Frontend** : Angular, Bootstrap, JavaScript, Typescript
+- **Backend** : PHP, MySQL, XAMPP
+- **API Testing** : Postman
+- **VSCODE** : IDE pour effectuer notre projet
+
+---
+
+## Équipe
+
+- **Hugo Goncalves Fernandes** - Développeur, conception backend
+- **Assia Mahdjoub** - Développeuse, Designer
+- **Ruben Pereira Da Silva** - Développeur, Designer & Chef de projet
+- **Ibtissam Chtioui** - Développeuse, conception backend
+
+---
+
+## Description du Projet
+
+Ce projet vise à améliorer la plateforme EasyToDrive avec un nouvel espace **Admin** et des fonctionnalités de gestion des élèves (GET, POST, PUT, DELETE). Le projet reste actuellement en développement même s'il est bien entamé, avec une attention particulière portée à l'intégration de l'API backend dans l'application Angular.
+
+### Fonctionnalités actuelles :
+
+- **Page d'administration** : L'administrateur peut ajouter, modifier et visualiser les élèves via un tableau dynamique.
+- **Interface de connexion** : L'admin se connecte avec les identifiants suivants :
+  - **Login** : admin
+  - **Mot de passe** : admin
+  - Pour tester avec des élèves :
+    - **Login** : hugogoncalves
+    - **Mot de passe** : test
+    - **Login** : assiamahdjoub
+    - **Mot de passe** : test
+- **Affichage des données** : Les élèves peuvent être visualisés sur un tableau.
+
+---
+
+## Difficultés Rencontrées
+
+L'une des principales difficultés a été l'intégration de l'API dans Angular, mais après plusieurs tests et découvertes, nous avons pu décomposer les étapes et les exécuter plus efficacement. Le processus d'intégration a été affiné pour améliorer la fluidité de l'application.
+
+---
+
+## Statut du Projet
+
+À ce jour (23/03), le projet est encore en cours de développement. La partie **Frontend** est en travaux, mais la section de **connexion** pour les deux espace (élève et admin) et la section **Admin** est déjà fonctionnelle. Les formulaires d'ajout et de modification d'élèves fonctionnent et permettent une gestion efficace des données avec une visualisaiton des données des élèves sur un tableau. 
+
+---
+
+## Auteurs
+
+- **Ibtissam Chtioui**
