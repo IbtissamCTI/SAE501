@@ -14,6 +14,8 @@ Elle propose une plateforme **Easy2Drive.fr** à laquelle sont abonnées environ
 - **Backend** : PHP, MySQL, XAMPP
 - **API Testing** : Postman
 - **VSCODE** : IDE pour effectuer notre projet
+- **Notion** : (<https://www.figma.com/design/x5WKQuhppVo3nzEUEcpjSE/Auto-%C3%A9cole?node-id=0-1&t=9KshUQyhiZgYm9mr-1>)
+
 
 ---
 
@@ -29,6 +31,12 @@ Elle propose une plateforme **Easy2Drive.fr** à laquelle sont abonnées environ
 ## Description du Projet
 
 Ce projet vise à améliorer la plateforme EasyToDrive avec un nouvel espace **Admin** et des fonctionnalités de gestion des élèves (GET, POST, PUT, DELETE). Le projet reste actuellement en développement même s'il est bien entamé, avec une attention particulière portée à l'intégration de l'API backend dans l'application Angular.
+
+## Gestion de Projet
+
+Pour suivre l'avancement du projet, consulter les tâches en cours et les documents associés, vous pouvez accéder à notre espace de gestion de projet Notion via le lien suivant :
+
+[Gestion de projet - Notion](<https://www.notion.so/SAE-402-Culture-3D-18e76a6976a980738d72ccb15ab38e9e?pvs=25>)
 
 ### Fonctionnalités actuelles :
 
