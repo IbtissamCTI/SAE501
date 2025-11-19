@@ -1,4 +1,4 @@
-# EasyToDrive - Plateforme de Formation au Permis de Conduire
+# NOVATIO
 
 ## Présentation de l'entreprise
 
