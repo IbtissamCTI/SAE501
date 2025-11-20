@@ -2,19 +2,17 @@
 
 ## Présentation de l'entreprise
 
-**EasyToDrive** est une entreprise de 70 salariés spécialisée dans la conception, le développement et la commercialisation de supports pédagogiques imprimés et digitaux pour la formation aux différentes catégories de permis de conduire (scooter ou voiturette, voiture, moto, remorque, bateau).
-
-Elle propose une plateforme **Easy2Drive.fr** à laquelle sont abonnées environ 6 000 auto-écoles réparties sur le territoire français et utilisée par plus de 500 000 élèves.
+**Novatio** fraîchement arrivée sur le marché des formations, souhaite se lancer dans le domaine des formations, en proposant aux entreprises et/ou aux particuliers des formations dans le numérique et les nouvelles technologies.
 
 ---
 
 ## Technologies Utilisées
 
-- **Frontend** : Angular, Bootstrap, JavaScript, Typescript
-- **Backend** : PHP, MySQL, XAMPP
+- **Frontend** : ReactJS, Tailwind, JavaScript
+- **Backend** : Springboot, MySQL, XAMPP
 - **API Testing** : Postman
-- **VSCODE** : IDE pour effectuer notre projet
-- **Notion** : (<https://www.figma.com/design/x5WKQuhppVo3nzEUEcpjSE/Auto-%C3%A9cole?node-id=0-1&t=9KshUQyhiZgYm9mr-1>)
+- **IDE** : Visual Studio Code, Inteliji
+- **Gestion de Projet** : Trello, Jira
 
 
 ---
@@ -23,8 +21,8 @@ Elle propose une plateforme **Easy2Drive.fr** à laquelle sont abonnées environ
 
 - **Hugo Goncalves Fernandes** - Développeur, conception backend
 - **Assia Mahdjoub** - Développeuse, Designer
-- **Ruben Pereira Da Silva** - Développeur, Designer & Chef de projet
-- **Ibtissam Chtioui** - Développeuse, conception backend
+- **Ruben Pereira Da Silva** - Développeur, Designer, 3D
+- **Ibtissam Chtioui** - Développeuse, conception backend & Chef de projet
 
 ---
 
