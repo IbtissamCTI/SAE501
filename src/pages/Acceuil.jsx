@@ -324,7 +324,7 @@ function acceuil() {
 					))}
 				</div>
 			</section>
-			<section className=" max-w-7xl rounded-3xl bg-[#4F46E5]  mx-auto ">
+			<section className=" max-w-7xl rounded-3xl bg-[#4F46E5]  mx-auto  mb-10">
 				<h1 className="text-6xl text-center pt-20 font-bold text-white pb-10">
 					Prêt à lancer votre carrière ?
 				</h1>
