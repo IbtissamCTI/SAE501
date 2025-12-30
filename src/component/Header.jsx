@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Zap } from "lucide-react";
+import { School } from "lucide-react";
 
 function header() {
 	useEffect(() => {
@@ -25,12 +25,12 @@ function header() {
 				<div className="mx-auto px-6 flex justify-between items-center">
 					<div className="flex items-center gap-2.5 font-bold text-2xl tracking-tighter text-white cursor-pointer hover:text-indigo-400 transition-colors">
 						<div className="bg-indigo-600 p-1.5 rounded-lg">
-							<Zap
+							<School 
 								className="h-5 w-5 text-white"
 								fill="currentColor"
 							/>
 						</div>
-						<span>MonProjet.</span>
+						<span>Novatio</span>
 					</div>
 
 					{/* Desktop Menu */}
