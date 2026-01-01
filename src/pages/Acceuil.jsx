@@ -351,7 +351,7 @@ function acceuil() {
 				</p>
 			</section>
 			<p className="text-center text-white pt-2 pb-10 text-lg text-[#B3B3B3]">
-					Pas de spam.Désabonnement à tout moment.
+					PCACA
 				</p>
 		</>
 	);
