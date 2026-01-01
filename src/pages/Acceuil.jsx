@@ -13,7 +13,7 @@ function acceuil() {
 	// Les données de la FAQ (textes à modifier ici)
 	const faqs = [
 		{
-			question: "Faut-il des pré-requis pour s'inscrire ?",
+			question: "Faut-il des pré-requis pour s'inscrire ?8",
 			answer: "Non, aucun diplôme ni compétence technique préalable n'est requis. Nous recherchons avant tout de la motivation, de la logique et une grande envie d'apprendre.",
 		},
 		{
