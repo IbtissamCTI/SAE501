@@ -1,64 +1,92 @@
 import React from "react";
-import { Star } from "lucide-react"; // Si tu as lucide, sinon svg
+import { Star } from "lucide-react";
 
-// Ce composant sert de coquille vide pour Login ET Inscription
-const connexion = ({ title, subtitle, children, footerLink, footerText }) => {
+const AuthLayout = ({
+	title,
+	subtitle,
+	children,
+	footerText,
+	footerActionText,
+	onSwitch,
+}) => {
 	return (
 		<div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
-			{/* Fond avec effet "Code" (Décoration) */}
-			<div className="absolute inset-0 opacity-20 pointer-events-none">
-				<div className="absolute top-0 left-0 p-10 font-mono text-green-500 text-sm">
-					{"// The text runs across..."} <br />
-					{'<html lang="en">'} <br />
-					{"<body>"}
-				</div>
-				{/* Tu peux mettre une image de fond ici si tu préfères */}
-			</div>
+			{/* Fond Décoratif */}
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+			<div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
-			{/* La Carte Principale */}
-			<div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative z-10">
-				{/* Partie GAUCHE : Témoignage & Branding */}
-				<div className="md:w-1/2 p-12 flex flex-col justify-between bg-zinc-900/50 border-r border-white/5">
-					<div>
-						<h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-							Novatio
+			{/* Carte Principale */}
+			<div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative z-10 min-h-[600px]">
+				{/* Partie GAUCHE : Témoignage (Fixe) */}
+				<div className="hidden md:flex md:w-1/2 p-12 flex-col justify-between bg-zinc-900/50 border-r border-white/5 relative">
+					<div className="z-10">
+						<h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+							<div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-mono font-bold text-lg">
+								N
+							</div>
+							Novatio.
 						</h1>
 					</div>
 
-					<div className="mt-12 md:mt-0">
-						<div className="flex gap-1 mb-4 text-yellow-400">
+					<div className="z-10 relative">
+						<div className="absolute -top-10 -left-4 text-6xl text-indigo-500/20 font-serif">
+							"
+						</div>
+						<div className="flex gap-1 mb-6 text-yellow-400">
 							{[1, 2, 3, 4, 5].map((i) => (
-								<Star key={i} size={16} fill="currentColor" />
+								<Star
+									key={i}
+									size={18}
+									fill="currentColor"
+									className="text-yellow-400"
+								/>
 							))}
 						</div>
-						<p className="text-lg font-medium italic mb-4 text-gray-200">
-							"La meilleure plateforme pour apprendre le code
-							sérieusement. J'ai trouvé un job en 3 mois."
+						<p className="text-xl font-medium leading-relaxed text-gray-200 mb-6">
+							J'étais perdu dans les tutos YouTube. Novatio m'a
+							donné la structure et le mentorat qu'il me fallait.
+							J'ai signé mon CDI 2 semaines après la fin du
+							bootcamp.
 						</p>
-						<p className="text-sm text-gray-500 font-bold uppercase tracking-wide">
-							— Thomas D., Développeur Front-End
-						</p>
+						<div className="flex items-center gap-4">
+							<div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden border border-white/20">
+								<img
+									src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80"
+									alt="User"
+								/>
+							</div>
+							<div>
+								<p className="text-sm font-bold text-white">
+									Thomas Durand
+								</p>
+								<p className="text-xs text-indigo-400 font-semibold uppercase tracking-wider">
+									Développeur Front-End @ Qonto
+								</p>
+							</div>
+						</div>
 					</div>
+
+					<div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none"></div>
 				</div>
 
-				{/* Partie DROITE : Le Formulaire (Variable) */}
-				<div className="md:w-1/2 p-12 flex flex-col justify-center bg-black/80">
-					<div className="max-w-md mx-auto w-full">
-						<h2 className="text-3xl font-bold mb-2">{title}</h2>
-						<p className="text-gray-400 mb-8">{subtitle}</p>
+				{/* Partie DROITE : Contenu Variable */}
+				<div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-black/80">
+					<div className="max-w-sm mx-auto w-full transition-all duration-500 ease-in-out">
+						<h2 className="text-3xl font-bold mb-2 text-white">
+							{title}
+						</h2>
+						<p className="text-gray-400 mb-8 text-sm">{subtitle}</p>
 
-						{/* C'est ici qu'on injecte le formulaire spécifique (Login ou Signup) */}
 						{children}
 
-						{/* Lien bas de page (ex: "Déjà un compte ?") */}
-						<div className="mt-6 text-center text-sm text-gray-500">
+						<div className="mt-8 text-center text-sm text-gray-500">
 							{footerText}{" "}
-							<a
-								href="#"
-								className="text-purple-400 hover:text-purple-300 font-medium"
+							<button
+								onClick={onSwitch}
+								className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors underline decoration-transparent hover:decoration-indigo-300 ml-1"
 							>
-								{footerLink}
-							</a>
+								{footerActionText}
+							</button>
 						</div>
 					</div>
 				</div>
@@ -67,4 +95,4 @@ const connexion = ({ title, subtitle, children, footerLink, footerText }) => {
 	);
 };
 
-export default connexion;
+export default AuthLayout;
