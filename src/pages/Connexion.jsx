@@ -1,5 +1,6 @@
 import React from "react";
 import { Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const AuthLayout = ({
 	title,
@@ -7,7 +8,7 @@ const AuthLayout = ({
 	children,
 	footerText,
 	footerActionText,
-	onSwitch,
+	footerActionLink,
 }) => {
 	return (
 		<div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
@@ -81,12 +82,12 @@ const AuthLayout = ({
 
 						<div className="mt-8 text-center text-sm text-gray-500">
 							{footerText}{" "}
-							<button
-								onClick={onSwitch}
+							<Link
+								to={footerActionLink}
 								className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors underline decoration-transparent hover:decoration-indigo-300 ml-1"
 							>
 								{footerActionText}
-							</button>
+							</Link>
 						</div>
 					</div>
 				</div>

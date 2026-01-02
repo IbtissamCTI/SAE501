@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 
-import Header from "./component/header";
-import "./App.css";
-import Acceuil from "./pages/Acceuil.jsx";
+import Header from "./component/Header";
+
+import HeaderEleve from "./component/HeaderEleve";
 import Footer from "./component/Footer";
 
-
 function App() {
-	const [count, setCount] = useState(0);
+	const location = useLocation();
+	const isElevePage = location.pathname.startsWith("/eleve");
 
 	return (
 		<>
-			<Header />
-		
-			<Acceuil />
-			<Footer />
+			{isElevePage ? <HeaderEleve /> : <Header />}
+			<main>
+				<Outlet />
+			</main>
+			{!isElevePage && <Footer />}
 		</>
 	);
 }

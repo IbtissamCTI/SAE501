@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { Code, UsersRound, BriefcaseBusiness, ChevronDown, Send} from "lucide-react";
 import { useState } from "react";
 
-function acceuil() {
+function Acceuil() {
 	// On gère l'état de l'accordéon ici (null = tout fermé au début)
 	const [openIndex, setOpenIndex] = useState(null);
 
@@ -13,7 +13,7 @@ function acceuil() {
 	// Les données de la FAQ (textes à modifier ici)
 	const faqs = [
 		{
-			question: "Faut-il des pré-requis pour s'inscrire ?8",
+			question: "Faut-il des pré-requis pour s'inscrire ?",
 			answer: "Non, aucun diplôme ni compétence technique préalable n'est requis. Nous recherchons avant tout de la motivation, de la logique et une grande envie d'apprendre.",
 		},
 		{
@@ -31,7 +31,7 @@ function acceuil() {
 	];
 	return (
 		<>
-			<section className="p-40 w-auto h-auto flex flex-col justify-center items-center text-center px-4 relative overflow-hidden ">
+			<section id="home" className="p-40 w-auto h-auto flex flex-col justify-center items-center text-center px-4 relative overflow-hidden ">
 				<div
 					className={`inline-block px-9 py-1 rounded-full border-4 text-lg mb-6 bg-opacity-40 font-semibold text-2xl`}
 					style={{
@@ -106,7 +106,7 @@ function acceuil() {
 					</div>
 				</div>
 			</section>
-			<section className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
+			<section id="features" className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
 				<h1 className="text-white text-6xl my-10 font-bold text-center ">
 					Pourquoi Novatio est different ?
 				</h1>
@@ -164,7 +164,7 @@ function acceuil() {
 				</div>
 			</section>
 
-			<section className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
+			<section id="about" className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
 				<h1 className="text-white text-6xl my-10 font-bold text-center ">
 					Investissez dans votre Avenir
 				</h1>
@@ -275,7 +275,7 @@ function acceuil() {
 					</div>
 				</div>
 			</section>
-			<section>
+			<section id="testimonials">
 				<h1 className="text-6xl text-center mt-20 font-bold text-white mb-10">
 					Ce que disent nos étudiants
 				</h1>
@@ -351,10 +351,10 @@ function acceuil() {
 				</p>
 			</section>
 			<p className="text-center text-white pt-2 pb-10 text-lg text-[#B3B3B3]">
-					PCACA
+					
 				</p>
 		</>
 	);
 }
 
-export default acceuil;
+export default Acceuil;
