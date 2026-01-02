@@ -52,7 +52,7 @@ function Acceuil() {
 				>
 					NOUVELLE RENTRE OCTOBRE 2026
 				</div>
-				<div>
+				<div className="">
 					<h1 className="mt-14  font-bold text-8xl font-bold text-white">
 						L'Excellence du Code{" "}
 						<span
@@ -68,7 +68,7 @@ function Acceuil() {
 						</span>
 					</h1>
 					<p
-						className="mt-8 text-3xl text-gray-300 leading-loose "
+						className="mt-8 text-2xl text-gray-300 leading-loose max-w-5xl center mx-auto "
 						style={{
 							color: "#999999",
 						}}

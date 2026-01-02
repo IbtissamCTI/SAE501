@@ -210,13 +210,13 @@ export default function Formation() {
 	return (
 		<div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30">
 			{/* Style pour masquer la scrollbar */}
-			
+
 			{/* --- HERO SECTION --- */}
 			<header className="text-center px-20 mb-20">
-				<h1 className="mt-14 font-bold text-8xl text-white">
+				<h1 className="mt-14 font-bold text-9xl text-white">
 					Trouvez votre voie.{" "}
 				</h1>
-				<p className="text-gray-400 max-w-2xl mx-auto">
+				<p className="text-gray-400 max-w-2xl mx-auto text-2xl mt-4">
 					Sélectionnez votre domaine, choisissez votre techno,
 					lancez-vous.
 				</p>
@@ -225,13 +225,13 @@ export default function Formation() {
 			{/* --- ÉTAPE 1 : CARROUSEL CATÉGORIES --- */}
 			<section className="mb-20">
 				<div className="text-center mb-8">
-					<span className="text-xs font-bold text-blue-400 uppercase tracking-widest">
+					<span className="text-xl font-bold text-blue-400 uppercase tracking-widest">
 						Étape 1
 					</span>
-					<h2 className="text-2xl font-bold mt-1">
+					<h2 className="text-4xl font-bold mt-1">
 						Quel type de développeur êtes-vous ?
 					</h2>
-					<p className="text-xs text-gray-500 mt-1">
+					<p className="text-2xl text-gray-500 mt-1">
 						Scrollez ou cliquez pour sélectionner
 					</p>
 				</div>
