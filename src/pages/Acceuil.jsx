@@ -1,6 +1,13 @@
 import { Check } from "lucide-react";
-import { Code, UsersRound, BriefcaseBusiness, ChevronDown, Send} from "lucide-react";
+import {
+	Code,
+	UsersRound,
+	BriefcaseBusiness,
+	ChevronDown,
+	Send,
+} from "lucide-react";
 import { useState } from "react";
+import { Link } from "lucide-react";
 
 function Acceuil() {
 	// On gère l'état de l'accordéon ici (null = tout fermé au début)
@@ -31,7 +38,10 @@ function Acceuil() {
 	];
 	return (
 		<>
-			<section id="home" className="p-40 w-auto h-auto flex flex-col justify-center items-center text-center px-4 relative overflow-hidden ">
+			<section
+				id="home"
+				className="p-40 w-auto h-auto flex flex-col justify-center items-center text-center px-4 relative overflow-hidden "
+			>
 				<div
 					className={`inline-block px-9 py-1 rounded-full border-4 text-lg mb-6 bg-opacity-40 font-semibold text-2xl`}
 					style={{
@@ -80,9 +90,8 @@ function Acceuil() {
 					>
 						Explore les formations
 					</button>
-					<button
-						className="mt-10 bg-white border-2 border-indigo-600  px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg text-[#6057ED]"
-					>
+
+					<button className="mt-10 bg-white border-2 border-indigo-600  px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg text-[#6057ED]">
 						Voir la Salle
 					</button>
 				</div>
@@ -106,7 +115,10 @@ function Acceuil() {
 					</div>
 				</div>
 			</section>
-			<section id="features" className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
+			<section
+				id="features"
+				className="inline justify-between px-5 py-20  w-full flex flex-col items-center"
+			>
 				<h1 className="text-white text-6xl my-10 font-bold text-center ">
 					Pourquoi Novatio est different ?
 				</h1>
@@ -164,13 +176,17 @@ function Acceuil() {
 				</div>
 			</section>
 
-			<section id="about" className="inline justify-between px-5 py-20  w-full flex flex-col items-center">
+			<section
+				id="about"
+				className="inline justify-between px-5 py-20  w-full flex flex-col items-center"
+			>
 				<h1 className="text-white text-6xl my-10 font-bold text-center ">
 					Investissez dans votre Avenir
 				</h1>
 				<p className="text-gray-400 mb-10 text-xl text-center max-w-3xl">
-					Des formules transparentes, sans coûts cachés.<br />Eligible CPF
-					et OPCO
+					Des formules transparentes, sans coûts cachés.
+					<br />
+					Eligible CPF et OPCO
 				</p>
 				<div className="mt-20">
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
@@ -343,16 +359,15 @@ function Acceuil() {
 					/>
 					<button className="ml-4 bg-white text-black px-6 pt-3 rounded-lg font-bold hover:bg-gray-200 transition text-[#6057ED] justify-center flex items-center gap-2">
 						{" "}
-						S'incrire<Send color="#6057ED" />{" "}
+						S'incrire
+						<Send color="#6057ED" />{" "}
 					</button>
 				</div>
 				<p className="text-center text-white pt-2 pb-10 text-lg text-[#B3B3B3]">
 					Pas de spam.Désabonnement à tout moment.
 				</p>
 			</section>
-			<p className="text-center text-white pt-2 pb-10 text-lg text-[#B3B3B3]">
-					
-				</p>
+			<p className="text-center text-white pt-2 pb-10 text-lg text-[#B3B3B3]"></p>
 		</>
 	);
 }

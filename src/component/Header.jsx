@@ -38,8 +38,8 @@ function Header() {
 					<Link to="/#home" className="hover:text-white transition-colors">
 						Accueil
 					</Link>
-					<Link to="/#features" className="hover:text-white transition-colors">
-						Services
+					<Link to="/formation" className="hover:text-white transition-colors">
+						Formation
 					</Link>
 					<Link to="/#about" className="hover:text-white transition-colors">
 						À propos

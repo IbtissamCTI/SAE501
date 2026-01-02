@@ -9,6 +9,7 @@ import SignUp from "./component/SignUp.jsx";
 import TableauDeBord from "./pages/TableauDeBord.jsx";
 import MesCours from "./pages/MesCours.jsx";
 import MonProfil from "./pages/MonProfil.jsx";
+import Formation from "./pages/Formation.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
 			{
 				path: "inscription",
 				element: <SignUp />,
+			},
+				{
+				path: "formation",
+				element: <Formation />,
 			},
 			{
 				path: "eleve",

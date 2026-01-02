@@ -1,8 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { School, Bell, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { School, Bell, User, LogOut } from "lucide-react";
 
 function HeaderEleve() {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        navigate("/");
+    };
+
 	return (
 		<nav className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 py-4">
 			<div className="mx-auto px-6 flex justify-between items-center">
@@ -31,6 +37,9 @@ function HeaderEleve() {
                     </button>
                     <button className="text-slate-400 hover:text-white">
                         <User size={20} />
+                    </button>
+                    <button onClick={handleLogout} className="flex items-center gap-2 text-slate-400 hover:text-white">
+                        <LogOut size={20} />
                     </button>
                 </div>
 			</div>
