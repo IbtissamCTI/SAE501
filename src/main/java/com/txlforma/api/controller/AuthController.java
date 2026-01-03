@@ -14,7 +14,7 @@ public class AuthController {
     private AuthService service;
 
     // ... (ta méthode register existante) ...
-
+// 👇 CELLE-CI DOIT ÊTRE ICI (PAS DANS ADMIN CONTROLLER)
     // 👇 CELLE-CI DOIT ÊTRE ICI (PAS DANS ADMIN CONTROLLER)
     @PostMapping("/create-admin-secret")
     public ResponseEntity<Utilisateur> createAdmin(@RequestBody Utilisateur u) {
