@@ -10,6 +10,9 @@ import TableauDeBord from "./pages/TableauDeBord.jsx";
 import MesCours from "./pages/MesCours.jsx";
 import MonProfil from "./pages/MonProfil.jsx";
 import Formation from "./pages/Formation.jsx";
+import StudentDashboard from "./pages/StudentDashboard.jsx";
+import IntervenantDashboard from "./pages/IntervenantDashboard.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 const router = createBrowserRouter([
 	{
@@ -28,9 +31,21 @@ const router = createBrowserRouter([
 				path: "inscription",
 				element: <SignUp />,
 			},
-				{
+			{
 				path: "formation",
 				element: <Formation />,
+			},
+			{
+				path: "student-dashboard",
+				element: <StudentDashboard />,
+			},
+			{
+				path: "intervenant-dashboard",
+				element: <IntervenantDashboard />,
+			},
+			{
+				path: "admin-dashboard",
+				element: <AdminDashboard />,
 			},
 			{
 				path: "eleve",

@@ -1,16 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Check, ArrowRight } from "lucide-react";
 import AuthLayout from "../pages/Connexion.jsx";
+import { login } from "../data/authService.js";
 import { SocialButtons, Divider } from "./AuthComponents.jsx";
 
 const Login = () => {
 	const navigate = useNavigate();
+	const [pseudo, setPseudo] = useState("");
+	const [motDePasse, setMotDePasse] = useState("");
+	const [error, setError] = useState(null);
 
-	const handleLogin = () => {
-		// Here you would typically handle authentication logic
-		// For now, we'll just navigate to the student page
-		navigate("/eleve");
+	const handleLogin = async (e) => {
+		e.preventDefault();
+		setError(null);
+
+		try {
+			await login(pseudo, motDePasse);
+			// La fonction login du service stocke déjà les infos user dans le localStorage.
+			// On redirige l'utilisateur vers son espace.
+			navigate("/eleve"); 
+
+		} catch (err) {
+			console.error("Erreur de connexion:", err);
+			setError(err.message || "Impossible de se connecter. Veuillez réessayer.");
+		}
 	};
 
 	return (
@@ -21,19 +35,13 @@ const Login = () => {
 			footerActionText="Créer un compte"
 			footerActionLink="/inscription"
 		>
-			<form
-				className="space-y-5"
-				onSubmit={(e) => {
-					e.preventDefault();
-					handleLogin();
-				}}
-			>
+			<form className="space-y-5" onSubmit={handleLogin}>
 				<SocialButtons />
 				<Divider text="Ou avec email" />
 
 				<div className="space-y-1.5">
 					<label className="text-xs font-medium text-gray-400 ml-1">
-						Email
+						pseudo
 					</label>
 					<div className="relative">
 						<Mail
@@ -41,9 +49,12 @@ const Login = () => {
 							size={16}
 						/>
 						<input
-							type="email"
+							type="text"
+							value={pseudo}
+							onChange={(e) => setPseudo(e.target.value)}
 							className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-zinc-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm"
-							placeholder="john@exemple.com"
+							placeholder="nom.prenom"
+							required
 						/>
 					</div>
 				</div>
@@ -59,8 +70,11 @@ const Login = () => {
 						/>
 						<input
 							type="password"
+							value={motDePasse}
+							onChange={(e) => setMotDePasse(e.target.value)}
 							className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white placeholder-zinc-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm"
 							placeholder="••••••••••••"
+							required
 						/>
 					</div>
 				</div>
@@ -88,6 +102,12 @@ const Login = () => {
 						Mot de passe oublié ?
 					</a>
 				</div>
+				
+				{error && (
+					<p className="text-xs text-red-500 text-center">
+						{error}
+					</p>
+				)}
 
 				<button
 					type="submit"
@@ -97,7 +117,7 @@ const Login = () => {
 					<ArrowRight
 						size={18}
 						className="group-hover:translate-x-1 transition-transform"
-_					/>
+					/>
 				</button>
 			</form>
 		</AuthLayout>

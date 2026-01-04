@@ -29,6 +29,15 @@ function HeaderEleve() {
 					<Link to="/eleve/profil" className="hover:text-white transition-colors">
 						Mon Profil
 					</Link>
+					<Link to="/student-dashboard" className="hover:text-white transition-colors">
+						Student Dashboard
+					</Link>
+					<Link to="/intervenant-dashboard" className="hover:text-white transition-colors">
+						Intervenant Dashboard
+					</Link>
+					<Link to="/admin-dashboard" className="hover:text-white transition-colors">
+						Admin Dashboard
+					</Link>
 				</div>
 
                 <div className="flex items-center gap-4">
