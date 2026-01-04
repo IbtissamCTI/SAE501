@@ -32,7 +32,7 @@ public class Resultat {
 
     // Relation vers la Session
     // ⚠️ Assure-toi d'avoir une classe "Session" ou change le type si nécessaire
-    @ManyToOne
-    @JoinColumn(name = "id_sessions")
-    private Session session;
+    //@ManyToOne
+   // @JoinColumn(name = "id_sessions")
+   // private Session session;
 }

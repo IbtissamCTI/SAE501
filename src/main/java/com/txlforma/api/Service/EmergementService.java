@@ -19,7 +19,6 @@ public class EmergementService {
     }
 
     public Emergement save(Emergement emergement) {
-        //date automatiquement si non fournie
         if (emergement.getDate() == null) {
             emergement.setDate(LocalDateTime.now());
         }
