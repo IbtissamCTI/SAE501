@@ -7,6 +7,11 @@ import com.txlforma.api.repository.UtilisateurRepository;
 import com.txlforma.api.repository.FormationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+
+import java.time.LocalDate;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate; // AJOUT INDISPENSABLE
 import java.util.List;

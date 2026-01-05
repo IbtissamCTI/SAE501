@@ -1,4 +1,4 @@
-package com.txlforma.api.service;
+/*package com.txlforma.api.service;
 
 import com.txlforma.api.model.*;
 import com.txlforma.api.repository.*;
@@ -47,4 +47,4 @@ public class PaiementService {
 
         return paiementRepo.save(paiement);
     }
-}
+}*/

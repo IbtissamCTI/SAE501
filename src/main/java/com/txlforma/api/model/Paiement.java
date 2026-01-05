@@ -1,4 +1,4 @@
-package com.txlforma.api.model;
+/*package com.txlforma.api.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,4 +21,4 @@ public class Paiement {
     @ManyToOne
     @JoinColumn(name = "id_session")
     private Session session;
-}
+}*/
