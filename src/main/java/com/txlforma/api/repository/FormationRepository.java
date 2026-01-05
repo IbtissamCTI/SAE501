@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface FormationRepository extends JpaRepository<Formation, Long> {
-    // Permet de filtrer par catégorie (ex: "Réseaux")
+    // Crucial pour filtrer par catégorie dans React
     List<Formation> findByCategorie(String categorie);
 }

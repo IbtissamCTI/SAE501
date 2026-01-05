@@ -1,4 +1,4 @@
-package com.txlforma.api.service; // Correction: minuscule 'service'
+package com.txlforma.api.service;
 
 import com.txlforma.api.model.Formation;
 import com.txlforma.api.model.Session;
@@ -7,15 +7,23 @@ import com.txlforma.api.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FormationService {
 
-    @Autowired private FormationRepository formationRepo;
-    @Autowired private SessionRepository sessionRepo;
+    @Autowired
+    private FormationRepository formationRepo;
+
+    @Autowired
+    private SessionRepository sessionRepo;
 
     public List<Formation> getAllFormations() {
         return formationRepo.findAll();
+    }
+
+    public Optional<Formation> getFormationById(Long id) {
+        return formationRepo.findById(id);
     }
 
     public List<Formation> getByCategorie(String cat) {
@@ -29,6 +37,7 @@ public class FormationService {
     public Session ajouterSession(Long idFormation, Session session) {
         Formation formation = formationRepo.findById(idFormation)
                 .orElseThrow(() -> new RuntimeException("Formation introuvable"));
+
         session.setFormation(formation);
         return sessionRepo.save(session);
     }
