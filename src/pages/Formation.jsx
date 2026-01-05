@@ -201,10 +201,8 @@ export default function Formation() {
 
 	const handlePayment = () => {
 		setIsPaying(true);
-		setTimeout(() => {
-			alert("Redirection vers Stripe...");
-			setIsPaying(false);
-		}, 1500);
+		// Redirection vers une page de paiement Stripe (URL de test)
+		window.location.href = "https://buy.stripe.com/test_5kAcNaaabcdeFghi";
 	};
 
 	return (
