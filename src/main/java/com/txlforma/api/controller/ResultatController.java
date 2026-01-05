@@ -15,7 +15,23 @@ public class ResultatController {
     @Autowired
     private ResultatService service;
 
-    // Ajouter une note (Admin ou Intervenant seulement)
+    // ✅ NOUVELLE ROUTE (Intervenant : note + calcul auto)
+    @PostMapping("/noter")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INTERVENANT')")
+    public ResponseEntity<?> noterEleve(
+            @RequestParam Long idSession,
+            @RequestParam Long idApprenti,
+            @RequestParam Double note,
+            @RequestParam(required = false) String appreciation) {
+        try {
+            Resultat res = service.attribuerNoteFinale(idSession, idApprenti, note, appreciation);
+            return ResponseEntity.ok(res);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
+        }
+    }
+
+    // ✅ TON ANCIENNE ROUTE (Garde-la pour ne rien casser)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'INTERVENANT')")
     public ResponseEntity<Resultat> addResultat(@RequestBody Resultat resultat,
@@ -24,14 +40,12 @@ public class ResultatController {
         return ResponseEntity.ok(service.ajouterNote(resultat, idApprenti, idSession));
     }
 
-    // Voir toutes les notes (Admin)
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Resultat>> getAllResultats() {
         return ResponseEntity.ok(service.getAllResultats());
     }
 
-    // Voir les notes d'un étudiant spécifique
     @GetMapping("/apprenti/{id}")
     public ResponseEntity<List<Resultat>> getResultatsByApprenti(@PathVariable Long id) {
         return ResponseEntity.ok(service.getNotesApprenti(id));

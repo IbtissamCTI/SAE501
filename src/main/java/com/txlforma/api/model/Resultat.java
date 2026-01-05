@@ -3,9 +3,6 @@ package com.txlforma.api.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
-/**
- * Entité Resultat - Résultats des formations
- */
 @Entity
 @Table(name = "resultats")
 public class Resultat {
@@ -23,20 +20,14 @@ public class Resultat {
     private Session session;
 
     private Double note;
-
     private String appreciation;
-
     private Boolean valide;
-
     private LocalDate dateExamen;
-
-    // ============================================
-    // CONSTRUCTEURS
-    // ============================================
 
     public Resultat() {
     }
 
+    // Constructeur complet
     public Resultat(Utilisateur apprenti, Session session, Double note,
                     String appreciation, Boolean valide, LocalDate dateExamen) {
         this.apprenti = apprenti;
@@ -47,74 +38,36 @@ public class Resultat {
         this.dateExamen = dateExamen;
     }
 
-    // ============================================
-    // GETTERS ET SETTERS
-    // ============================================
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public Utilisateur getApprenti() { return apprenti; }
+    public void setApprenti(Utilisateur apprenti) { this.apprenti = apprenti; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Session getSession() { return session; }
+    public void setSession(Session session) { this.session = session; }
 
-    public Utilisateur getApprenti() {
-        return apprenti;
-    }
+    public Double getNote() { return note; }
 
-    public void setApprenti(Utilisateur apprenti) {
-        this.apprenti = apprenti;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    public Double getNote() {
-        return note;
-    }
-
+    // ✅ La règle métier est ici : si on met une note, on calcule la réussite
     public void setNote(Double note) {
         this.note = note;
+        if (note != null) {
+            this.valide = note >= 10.0;
+        }
     }
 
-    public String getAppreciation() {
-        return appreciation;
-    }
+    public String getAppreciation() { return appreciation; }
+    public void setAppreciation(String appreciation) { this.appreciation = appreciation; }
 
-    public void setAppreciation(String appreciation) {
-        this.appreciation = appreciation;
-    }
+    public Boolean getValide() { return valide; }
+    public void setValide(Boolean valide) { this.valide = valide; }
 
-    public Boolean getValide() {
-        return valide;
-    }
-
-    public void setValide(Boolean valide) {
-        this.valide = valide;
-    }
-
-    public LocalDate getDateExamen() {
-        return dateExamen;
-    }
-
-    public void setDateExamen(LocalDate dateExamen) {
-        this.dateExamen = dateExamen;
-    }
+    public LocalDate getDateExamen() { return dateExamen; }
+    public void setDateExamen(LocalDate dateExamen) { this.dateExamen = dateExamen; }
 
     @Override
     public String toString() {
-        return "Resultat{" +
-                "id=" + id +
-                ", note=" + note +
-                ", appreciation='" + appreciation + '\'' +
-                ", valide=" + valide +
-                ", dateExamen=" + dateExamen +
-                '}';
+        return "Resultat{" + "id=" + id + ", note=" + note + ", valide=" + valide + '}';
     }
 }
