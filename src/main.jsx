@@ -13,7 +13,7 @@ import MesCours from "./pages/MesCours.jsx";
 import MonProfil from "./pages/MonProfil.jsx";
 import SignUp from "./component/SignUp.jsx";
 
-// Import unique pour la connexion
+// Import unique pouqFDS>Sr la connexion
 import Connexion from "./pages/Connexion.jsx"; 
 
 import StudentDashboard from "./pages/StudentDashboard.jsx";
@@ -28,8 +28,8 @@ const router = createBrowserRouter([
             { index: true, element: <Acceuil /> },
             { path: "formation", element: <Formation /> },
             { path: "inscription", element: <SignUp /> },
-            
-            // Une seule route pour le flux de connexion
+
+            // Une seule route pour le flux de connexiogn
             { path: "connexion", element: <Connexion /> },
 
             // Routes Dashboards

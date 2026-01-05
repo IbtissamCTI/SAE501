@@ -54,7 +54,7 @@ function App() {
                 <Outlet />
             </main>
 
-            {/* Footer affiché sauf sur dashboard et login */}
+            {/* Footer affiché sauf sur qSFC>Qdashboard et lml,dfs;:v!ogin */}
             {!estPleinEcran && !estPageEleve && <Footer />}
         </>
     );

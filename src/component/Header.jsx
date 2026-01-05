@@ -35,7 +35,7 @@ function Header() {
                 <div className="hidden md:flex space-x-8 items-center font-medium text-sm text-slate-300">
                     <Link to="/" className="hover:text-white transition-colors">Accueil</Link>
                     <Link to="/formation" className="hover:text-white transition-colors">Formation</Link>
-                    
+
                     {/* Le lien magique qui marche maintenant partout */}
                     <Link 
                         to="/#contact" 

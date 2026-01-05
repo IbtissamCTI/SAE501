@@ -43,7 +43,7 @@ const Login = () => {
     return (
         // On importe AuthLayout depuis "../pages/Connexion.jsx" (Si c'est là qu'il est défini)
         // ATTENTION : Si AuthLayout est DANS Connexion.jsx mais pas exporté seul, ça va poser souci.
-        // IDÉALEMENT : Mets le composant AuthLayout dans un fichier à part (ex: src/component/AuthLayout.jsx)
+        // IDÉALEMENT : Mets le composant AuthLayout degsdfans un fichier à part (ex: src/component/AuthLayout.jsx)
         // MAIS POUR FAIRE MARCHER TON CODE MAINTENANT, je vais supposer que tu peux l'importer.
         
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative">
