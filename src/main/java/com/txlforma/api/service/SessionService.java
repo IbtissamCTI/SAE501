@@ -4,8 +4,11 @@ import com.txlforma.api.model.Session;
 import com.txlforma.api.model.Utilisateur;
 import com.txlforma.api.repository.SessionRepository;
 import com.txlforma.api.repository.UtilisateurRepository;
+import com.txlforma.api.repository.FormationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate; // AJOUT INDISPENSABLE
 import java.util.List;
 
 @Service
@@ -13,10 +16,17 @@ public class SessionService {
 
     @Autowired private SessionRepository sessionRepo;
     @Autowired private UtilisateurRepository userRepo;
+    @Autowired private FormationRepository formationRepo;
 
-    // Mise à jour par l'Admin
-    public Session updateSession(Long id, Session nouvellesInfos, Long idProf) {
-        Session session = sessionRepo.findById(id)
+    public Session creerSession(Session s, Long idFormation) {
+        com.txlforma.api.model.Formation f = formationRepo.findById(idFormation)
+                .orElseThrow(() -> new RuntimeException("Formation introuvable"));
+        s.setFormation(f);
+        return sessionRepo.save(s);
+    }
+
+    public Session updateSession(Long idSession, Session nouvellesInfos, Long idProf) {
+        Session session = sessionRepo.findById(idSession)
                 .orElseThrow(() -> new RuntimeException("Session introuvable"));
 
         if(nouvellesInfos.getSalle() != null) session.setSalle(nouvellesInfos.getSalle());
@@ -31,23 +41,37 @@ public class SessionService {
         return sessionRepo.save(session);
     }
 
-    public void deleteSession(Long id) { sessionRepo.deleteById(id); }
+    // ✅ MÉTHODE STATUT CORRIGÉE
+    public String calculerStatut(Session s) {
+        LocalDate aujourdhui = LocalDate.now();
+        // On vérifie que dateFin n'est pas nulle pour éviter un crash
+        if (s.getDateFin() != null && s.getDateFin().isBefore(aujourdhui)) {
+            return "FINI";
+        }
+        return "EN COURS / A VENIR";
+    }
 
-    // Planning pour l'Intervenant
-    public List<Session> getPlanningIntervenant(Long idInt) {
-        Utilisateur prof = userRepo.findById(idInt)
+    public void deleteSession(Long id) {
+        sessionRepo.deleteById(id);
+    }
+
+    public List<Session> getPlanningIntervenant(Long idIntervenant) {
+        Utilisateur prof = userRepo.findById(idIntervenant)
                 .orElseThrow(() -> new RuntimeException("Intervenant introuvable"));
         return sessionRepo.findByIntervenant(prof);
     }
 
-    // Inscription pour l'Apprenti
     public void inscrireApprenti(Long idSession, Long idApprenti) {
-        Session s = sessionRepo.findById(idSession).orElseThrow();
-        Utilisateur a = userRepo.findById(idApprenti).orElseThrow();
+        Session session = sessionRepo.findById(idSession)
+                .orElseThrow(() -> new RuntimeException("Session introuvable"));
+        Utilisateur apprenti = userRepo.findById(idApprenti)
+                .orElseThrow(() -> new RuntimeException("Apprenti introuvable"));
 
-        if (!s.getParticipants().contains(a)) {
-            s.getParticipants().add(a);
-            sessionRepo.save(s);
+        if (!session.getParticipants().contains(apprenti)) {
+            session.getParticipants().add(apprenti);
+            sessionRepo.save(session);
+        } else {
+            throw new RuntimeException("Déjà inscrit à cette session !");
         }
     }
 }

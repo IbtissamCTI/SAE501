@@ -31,11 +31,26 @@ public class AuthService {
     }
 
     // Création Intervenant (existant)
+    // Dans AuthService.java
+
     public Utilisateur creerIntervenant(Utilisateur u) {
-        String pseudo = u.getNom().toLowerCase() + "." + u.getPrenom().toLowerCase();
-        u.setPseudo(pseudo);
+        // 1. Vérification de sécurité pour le mot de passe
+        if (u.getMotDePasse() == null || u.getMotDePasse().isEmpty()) {
+            throw new IllegalArgumentException("Le mot de passe est obligatoire dans la requête JSON");
+        }
+
+        // 2. Génération du pseudo si non fourni
+        if (u.getPseudo() == null || u.getPseudo().isEmpty()) {
+            String pseudoGenere = u.getNom().toLowerCase() + "." + u.getPrenom().toLowerCase();
+            u.setPseudo(pseudoGenere);
+        }
+
+        // 3. Hachage du mot de passe
         u.setMotDePasse(passwordEncoder.encode(u.getMotDePasse()));
+
+        // 4. Attribution du rôle
         u.setRole(Role.INTERVENANT);
+
         return repository.save(u);
     }
 

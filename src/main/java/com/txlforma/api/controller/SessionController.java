@@ -21,7 +21,13 @@ public class SessionController {
                                           @RequestParam(required = false) Long idProf) {
         return ResponseEntity.ok(service.updateSession(id, s, idProf));
     }
+// À ajouter dans SessionController.java
 
+    @PostMapping("/admin/creer")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Session> create(@RequestBody Session s, @RequestParam Long idFormation) {
+        return ResponseEntity.ok(service.creerSession(s, idFormation));
+    }
     @GetMapping("/intervenant/{idProf}")
     public List<Session> getPlanning(@PathVariable Long idProf) {
         return service.getPlanningIntervenant(idProf);
