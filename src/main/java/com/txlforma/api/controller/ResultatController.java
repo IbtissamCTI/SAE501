@@ -3,47 +3,53 @@ package com.txlforma.api.controller;
 import com.txlforma.api.model.Resultat;
 import com.txlforma.api.service.ResultatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/resultats")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ResultatController {
 
     @Autowired
     private ResultatService service;
 
-    // ✅ NOUVELLE ROUTE (Intervenant : note + calcul auto)
-    @PostMapping("/noter")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'INTERVENANT')")
-    public ResponseEntity<?> noterEleve(
-            @RequestParam Long idSession,
-            @RequestParam Long idApprenti,
-            @RequestParam Double note,
-            @RequestParam(required = false) String appreciation) {
+    // ✅ NOUVELLE ROUTE : Télécharger la certification
+    @GetMapping("/certification/{id}")
+    public ResponseEntity<byte[]> téléchargerCertification(@PathVariable Long id) {
         try {
-            Resultat res = service.attribuerNoteFinale(idSession, idApprenti, note, appreciation);
-            return ResponseEntity.ok(res);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
+            String contenu = service.genererCertificationTexte(id);
+            byte[] contenuBytes = contenu.getBytes();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Certification_TXL_Forma.txt")
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(contenuBytes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
-    // ✅ TON ANCIENNE ROUTE (Garde-la pour ne rien casser)
-    @PostMapping
+    @PostMapping("/noter")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'INTERVENANT')")
-    public ResponseEntity<Resultat> addResultat(@RequestBody Resultat resultat,
-                                                @RequestParam Long idApprenti,
-                                                @RequestParam(required = false) Long idSession) {
-        return ResponseEntity.ok(service.ajouterNote(resultat, idApprenti, idSession));
-    }
+    public ResponseEntity<?> noterEleve(@RequestBody Map<String, Object> payload) {
+        try {
+            Long idSession = Long.valueOf(payload.get("idSession").toString());
+            Long idApprenti = Long.valueOf(payload.get("idApprenti").toString());
+            Double note = Double.valueOf(payload.get("note").toString());
+            String appreciation = payload.get("appreciation") != null ? payload.get("appreciation").toString() : "";
 
-    @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<Resultat>> getAllResultats() {
-        return ResponseEntity.ok(service.getAllResultats());
+            Resultat res = service.attribuerNoteFinale(idSession, idApprenti, note, appreciation);
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
+        }
     }
 
     @GetMapping("/apprenti/{id}")
@@ -51,8 +57,5 @@ public class ResultatController {
         return ResponseEntity.ok(service.getNotesApprenti(id));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Resultat> getResultatById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getResultatById(id));
-    }
+    // Autres méthodes GetMapping...
 }
