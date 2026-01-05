@@ -1,6 +1,6 @@
 package com.txlforma.api.controller;
 
-import com.txlforma.api.model.LoginRequest; // Import du fichier créé à l'étape 2
+import com.txlforma.api.model.LoginRequest;
 import com.txlforma.api.model.Utilisateur;
 import com.txlforma.api.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;

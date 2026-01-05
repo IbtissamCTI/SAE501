@@ -31,8 +31,6 @@ public class AuthService {
     }
 
     // Création Intervenant (existant)
-    // Dans AuthService.java
-
     public Utilisateur creerIntervenant(Utilisateur u) {
         // 1. Vérification de sécurité pour le mot de passe
         if (u.getMotDePasse() == null || u.getMotDePasse().isEmpty()) {
