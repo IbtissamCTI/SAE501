@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/formations/**").permitAll()
+                        .requestMatchers("/api/intervenant/**").hasAuthority("INTERVENANT")
                         // ✅ Routes protégées par rôle
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/auth/create-admin-secret").hasAuthority("ADMIN")

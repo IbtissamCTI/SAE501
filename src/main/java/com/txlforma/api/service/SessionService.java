@@ -2,18 +2,13 @@ package com.txlforma.api.service;
 
 import com.txlforma.api.model.Session;
 import com.txlforma.api.model.Utilisateur;
+import com.txlforma.api.model.Formation;
 import com.txlforma.api.repository.SessionRepository;
 import com.txlforma.api.repository.UtilisateurRepository;
 import com.txlforma.api.repository.FormationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-
 import java.time.LocalDate;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import java.time.LocalDate; // AJOUT INDISPENSABLE
 import java.util.List;
 
 @Service
@@ -23,8 +18,12 @@ public class SessionService {
     @Autowired private UtilisateurRepository userRepo;
     @Autowired private FormationRepository formationRepo;
 
+    public List<Session> getAllSessions() {
+        return sessionRepo.findAll();
+    }
+
     public Session creerSession(Session s, Long idFormation) {
-        com.txlforma.api.model.Formation f = formationRepo.findById(idFormation)
+        Formation f = formationRepo.findById(idFormation)
                 .orElseThrow(() -> new RuntimeException("Formation introuvable"));
         s.setFormation(f);
         return sessionRepo.save(s);
@@ -37,6 +36,8 @@ public class SessionService {
         if(nouvellesInfos.getSalle() != null) session.setSalle(nouvellesInfos.getSalle());
         if(nouvellesInfos.getLieu() != null) session.setLieu(nouvellesInfos.getLieu());
         if(nouvellesInfos.getHoraires() != null) session.setHoraires(nouvellesInfos.getHoraires());
+        if(nouvellesInfos.getDateDebut() != null) session.setDateDebut(nouvellesInfos.getDateDebut());
+        if(nouvellesInfos.getDateFin() != null) session.setDateFin(nouvellesInfos.getDateFin());
 
         if(idProf != null) {
             Utilisateur prof = userRepo.findById(idProf)
@@ -46,26 +47,6 @@ public class SessionService {
         return sessionRepo.save(session);
     }
 
-    // ✅ MÉTHODE STATUT CORRIGÉE
-    public String calculerStatut(Session s) {
-        LocalDate aujourdhui = LocalDate.now();
-        // On vérifie que dateFin n'est pas nulle pour éviter un crash
-        if (s.getDateFin() != null && s.getDateFin().isBefore(aujourdhui)) {
-            return "FINI";
-        }
-        return "EN COURS / A VENIR";
-    }
-
-    public void deleteSession(Long id) {
-        sessionRepo.deleteById(id);
-    }
-
-    public List<Session> getPlanningIntervenant(Long idIntervenant) {
-        Utilisateur prof = userRepo.findById(idIntervenant)
-                .orElseThrow(() -> new RuntimeException("Intervenant introuvable"));
-        return sessionRepo.findByIntervenant(prof);
-    }
-
     public void inscrireApprenti(Long idSession, Long idApprenti) {
         Session session = sessionRepo.findById(idSession)
                 .orElseThrow(() -> new RuntimeException("Session introuvable"));
@@ -73,10 +54,21 @@ public class SessionService {
                 .orElseThrow(() -> new RuntimeException("Apprenti introuvable"));
 
         if (!session.getParticipants().contains(apprenti)) {
-            session.getParticipants().add(apprenti);
+            session.addParticipant(apprenti);
             sessionRepo.save(session);
         } else {
             throw new RuntimeException("Déjà inscrit à cette session !");
         }
+    }
+
+    // ✅ MÉTHODE AJOUTÉE : Récupère le planning d'un intervenant
+    public List<Session> getPlanningIntervenant(Long idIntervenant) {
+        Utilisateur intervenant = userRepo.findById(idIntervenant)
+                .orElseThrow(() -> new RuntimeException("Intervenant introuvable"));
+        return sessionRepo.findByIntervenant(intervenant);
+    }
+
+    public void deleteSession(Long id) {
+        sessionRepo.deleteById(id);
     }
 }

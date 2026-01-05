@@ -12,3 +12,5 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     // ✅ Recherche les sessions d'un intervenant spécifique
     List<Session> findByIntervenant(Utilisateur intervenant);
 }
+
+
