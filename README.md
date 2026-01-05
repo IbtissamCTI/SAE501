@@ -1,4 +1,4 @@
-# TXLFORMA Plateforme de Gestion de Formation (LMS)
+# NOVATIO Plateforme de Gestion de Formation (LMS)
 
 **Projet Universitaire - SAE 501** Digitalisation des processus administratifs et pédagogiques d'un centre de formation.
 
@@ -6,7 +6,7 @@
 
 ## Présentation du Projet
 
-TXLFORMA est une application web de gestion de centre de formation (Learning Management System). Ce projet répond à un besoin de modernisation des infrastructures existantes, couvrant l'intégralité du cycle de vie d'une formation : de l'inscription d'un apprenant jusqu'à la délivrance de son attestation de réussite.
+NOVATIO est une application web de gestion de centre de formation (Learning Management System). Ce projet répond à un besoin de modernisation des infrastructures existantes, couvrant l'intégralité du cycle de vie d'une formation : de l'inscription d'un apprenant jusqu'à la délivrance de son attestation de réussite.
 
 L'application met l'accent sur la sécurité des transactions via une simulation de paiement, la gestion des droits utilisateurs et l'assiduité par un système d'émargement numérique.
 
