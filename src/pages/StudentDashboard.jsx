@@ -66,7 +66,7 @@ const CustomBarChart = ({ data }) => {
 					<div key={i} className="w-full h-[1px] bg-gray-500"></div>
 				))}
 			</div>
-			{/**/ }
+			{/*fffffffffff*/ }
 			{data.map((item, index) => {
 				const heightPct = (item.value / maxVal) * 100;
 				return (

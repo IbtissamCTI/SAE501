@@ -36,15 +36,9 @@ const Login = () => {
         }
     };
 
-    // Note : Ici on réutilise AuthLayout. Assure-toi que AuthLayout est bien exporté dans un fichier séparé
-    // ou alors copie le composant AuthLayout au début de ce fichier aussi si besoin.
-    // Pour l'instant je suppose que tu l'as exporté depuis Connexion.jsx comme tu l'avais fait.
+   
     
     return (
-        // On importe AuthLayout depuis "../pages/Connexion.jsx" (Si c'est là qu'il est défini)
-        // ATTENTION : Si AuthLayout est DANS Connexion.jsx mais pas exporté seul, ça va poser souci.
-        // IDÉALEMENT : Mets le composant AuthLayout degsdfans un fichier à part (ex: src/component/AuthLayout.jsx)
-        // MAIS POUR FAIRE MARCHER TON CODE MAINTENANT, je vais supposer que tu peux l'importer.
         
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative">
              {/* Je remets le design ici vite fait pour être sûr que ça marche sans erreur d'import */}

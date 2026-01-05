@@ -13,7 +13,7 @@ import MesCours from "./pages/MesCours.jsx";
 import MonProfil from "./pages/MonProfil.jsx";
 import SignUp from "./component/SignUp.jsx";
 
-// Import unique pouqFDS>Sr la connexion
+// Import unique pouqFDS>Sr la connefffffffffffffffxion
 import Connexion from "./pages/Connexion.jsx"; 
 
 import StudentDashboard from "./pages/StudentDashboard.jsx";

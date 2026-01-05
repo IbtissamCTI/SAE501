@@ -117,7 +117,7 @@ const SignUp = () => {
                     <p className="text-[10px] text-gray-500 ml-1">Min. 8 caractères</p>
                 </div>
 
-                {/* BOUTON ACTIrefgdON */}
+                {}
                 <button 
                     disabled={loading}
                     type="submit"

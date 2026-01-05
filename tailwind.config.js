@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} rkmelgs;fd:*/
+/** @type {import('tailwindcss').Config} rkmelgfffffffffs;fd:*/
 export default {
   content: [
     "./index.html",
