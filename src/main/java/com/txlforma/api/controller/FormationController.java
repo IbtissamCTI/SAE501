@@ -19,7 +19,7 @@ import java.util.List; // Import indispensable pour utiliser List
 public class FormationController {
 
     @Autowired
-    private FormationService service; // Le nom de la variable est 'service' caca sur 1°
+    private FormationService service; // Le nom de la variable est 'service' caaaaaaaaca sur 1°
 
     @PostMapping("/admin/creer")
     @PreAuthorize("hasAuthority('ADMIN')")
