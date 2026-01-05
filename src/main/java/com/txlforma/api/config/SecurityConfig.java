@@ -3,10 +3,10 @@ package com.txlforma.api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,13 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
-/**
- * Configuration de sécurité Spring Security
- *
- * Gère l'authentification et l'autorisation de l'application
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -37,31 +31,30 @@ public class SecurityConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * Configuration de la chaîne de filtres de sécurité
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Désactivé pour permettre les POST de React/Postman
                 .authorizeHttpRequests(auth -> auth
+                        // --- ACCÈS PUBLIC ---
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/formations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/formations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sessions/**").permitAll()
+
+                        // --- ACCÈS ADMIN ---
+                        .requestMatchers(HttpMethod.POST, "/api/formations/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+
+                        // --- TOUT LE RESTE ---
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
+                // ⚠️ ON SUPPRIME .httpBasic() POUR ÉVITER LA FENÊTRE DE LOGS DU NAVIGATEUR
                 .authenticationProvider(authenticationProvider());
 
         return http.build();
     }
 
-    /**
-     * Provider d'authentification - VERSION CORRIGÉE
-     *
-     * ⚠️ IMPORTANT : Utiliser AuthenticationProvider comme type de retour
-     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -70,28 +63,17 @@ public class SecurityConfig {
         return provider;
     }
 
-    /**
-     * AuthenticationManager pour gérer l'authentification
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * Configuration CORS
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173"
-        ));
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

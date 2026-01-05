@@ -9,45 +9,37 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-import java.time.LocalDate;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import java.util.List; // Import indispensable pour utiliser List
-
 @RestController
 @RequestMapping("/api/formations")
+@CrossOrigin(origins = "http://localhost:3000")
 public class FormationController {
 
     @Autowired
-    private FormationService service; // Le nom de la variable est 'service' caaaaaaaaca sur 1°
+    private FormationService service;
 
-    @PostMapping("/admin/creer")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Formation> create(@RequestBody Formation f) {
-        // Correction : on utilise 'service' pour correspondre à la déclaration ci-dessus
-        return ResponseEntity.ok(service.creerFormation(f));
-    }
-
-    // PUBLIC : Récupérer tout le catalogue
     @GetMapping
     public List<Formation> catalogue() {
         return service.getAllFormations();
     }
 
-    // PUBLIC : Filtrer par catégorie
+    @GetMapping("/{id}")
+    public ResponseEntity<Formation> getById(@PathVariable Long id) {
+        return service.getFormationById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/categorie/{cat}")
     public List<Formation> catalogueParCategorie(@PathVariable String cat) {
         return service.getByCategorie(cat);
     }
 
-    // ADMIN : Créer une nouvelle formation (Doublon de la route /admin/creer)
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Formation> createFormation(@RequestBody Formation f) {
         return ResponseEntity.ok(service.creerFormation(f));
     }
 
-    // ADMIN : Ajouter une session à une formation existante
     @PostMapping("/{id}/sessions")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Session> addSession(@PathVariable Long id, @RequestBody Session s) {
