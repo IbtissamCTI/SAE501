@@ -38,4 +38,9 @@ public class SessionController {
         service.inscrireApprenti(id, idApprenti);
         return ResponseEntity.ok("Inscription réussie");
     }
+
+    @GetMapping
+    public List<Session> getAll() {
+        return service.getAllSessions();
+    }
 }

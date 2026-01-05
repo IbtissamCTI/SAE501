@@ -3,6 +3,7 @@ package com.txlforma.api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -51,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/formations/**").permitAll()
                         .requestMatchers("/api/intervenant/**").hasAuthority("INTERVENANT")
                         // ✅ Routes protégées par rôle
+                        .requestMatchers(HttpMethod.GET, "/api/admin/formations").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/admin/sessions").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/auth/create-admin-secret").hasAuthority("ADMIN")
                         // ✅ Toutes les autres routes nécessitent une authentification
