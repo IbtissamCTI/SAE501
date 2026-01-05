@@ -2,7 +2,7 @@ package com.txlforma.api.config;
 
 import com.txlforma.api.model.Utilisateur;
 import com.txlforma.api.repository.UtilisateurRepository;
-import com.txlforma.api.Service.AuthService;
+import com.txlforma.api.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,10 @@ public class DataSeeder implements CommandLineRunner {
         if (userRepo.count() == 0) {
 
             Utilisateur admin = new Utilisateur();
-            admin.setNom("Boss");
-            admin.setPrenom("Big");
+            admin.setNom("Admin");
+            admin.setPrenom("Amdin");
             admin.setEmail("admin@txlforma.com");
-            admin.setMotDePasse("admin123");
+            admin.setMotDePasse("test123");
 
             authService.creerAdmin(admin);
 

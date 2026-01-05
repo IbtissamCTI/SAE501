@@ -1,44 +1,44 @@
 package com.txlforma.api.controller;
 
 import com.txlforma.api.model.Resultat;
-import com.txlforma.api.repository.ResultatRepository;
+import com.txlforma.api.service.ResultatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resultats")
 public class ResultatController {
 
     @Autowired
-    private ResultatRepository resultatRepository;
+    private ResultatService service;
 
-    // Ajouter une nouvelle note
+    // Ajouter une note (Admin ou Intervenant seulement)
     @PostMapping
-    public ResponseEntity<Resultat> addResultat(@RequestBody Resultat resultat) {
-        return ResponseEntity.ok(resultatRepository.save(resultat));
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INTERVENANT')")
+    public ResponseEntity<Resultat> addResultat(@RequestBody Resultat resultat,
+                                                @RequestParam Long idApprenti,
+                                                @RequestParam(required = false) Long idSession) {
+        return ResponseEntity.ok(service.ajouterNote(resultat, idApprenti, idSession));
     }
 
-    // Récupérer toutes les notes
+    // Voir toutes les notes (Admin)
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Resultat>> getAllResultats() {
-        return ResponseEntity.ok(resultatRepository.findAll());
+        return ResponseEntity.ok(service.getAllResultats());
     }
 
-    // Récupérer les notes d'un étudiant (par son ID)
+    // Voir les notes d'un étudiant spécifique
     @GetMapping("/apprenti/{id}")
     public ResponseEntity<List<Resultat>> getResultatsByApprenti(@PathVariable Long id) {
-        return ResponseEntity.ok(resultatRepository.findByApprentiId(id));
+        return ResponseEntity.ok(service.getNotesApprenti(id));
     }
 
-    // Récupérer une note précise par son ID
     @GetMapping("/{id}")
     public ResponseEntity<Resultat> getResultatById(@PathVariable Long id) {
-        Optional<Resultat> res = resultatRepository.findById(id);
-        return res.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getResultatById(id));
     }
 }

@@ -9,30 +9,16 @@ public class Resultat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_note")
     private Long id;
 
-    @Column(name = "nom_note")
-    private String nomNote;
+    private Double note;
+    private String commentaire;
 
-    @Column(name = "valeur_note")
-    private Float valeurNote;
-
-    // Relation vers l'Apprenti (Utilisateur)
-    // Dans le MLD c'est "idUser"
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "apprenti_id")
     private Utilisateur apprenti;
 
-    // Relation vers l'Intervenant (Utilisateur)
-    // Dans le MLD c'est "IdIterv"
     @ManyToOne
-    @JoinColumn(name = "id_iterv")
-    private Utilisateur intervenant;
-
-    // Relation vers la Session
-    // ⚠️ Assure-toi d'avoir une classe "Session" ou change le type si nécessaire
-    //@ManyToOne
-   // @JoinColumn(name = "id_sessions")
-   // private Session session;
+    @JoinColumn(name = "session_id") // Optionnel : pour lier la note à une session précise
+    private Session session;
 }
