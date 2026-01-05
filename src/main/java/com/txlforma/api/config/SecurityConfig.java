@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Configuration de sécurité Spring Security
@@ -46,21 +45,25 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // ✅ Routes publiques (sans authentification)
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/formations/**").permitAll()
+                        // ✅ Routes protégées par rôle
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/auth/create-admin-secret").hasAuthority("ADMIN")
+                        // ✅ Toutes les autres routes nécessitent une authentification
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
-                .authenticationProvider(authenticationProvider());
+                .httpBasic(Customizer.withDefaults());
+        // ❌ RETIRÉ : .authenticationProvider(authenticationProvider());
+        // Spring Boot le configure automatiquement
 
         return http.build();
     }
 
     /**
-     * Provider d'authentification - VERSION CORRIGÉE
-     *
-     * ⚠️ IMPORTANT : Utiliser AuthenticationProvider comme type de retour
+     * Provider d'authentification
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
