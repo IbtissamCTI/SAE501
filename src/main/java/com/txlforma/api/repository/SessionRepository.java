@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
-    // Permet de trouver les sessions d'un prof spécifique
+
+    // ✅ Recherche les sessions d'un intervenant spécifique
     List<Session> findByIntervenant(Utilisateur intervenant);
 }
