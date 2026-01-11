@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
     Atom, Server, Layers, BarChart, Cloud, Database, LayoutTemplate,
-    Coffee, FileCode, Container, CloudLightning, CheckCircle,
-    Circle, Lock, Calendar, ChevronRight, MapPin, Clock
+    CheckCircle, Lock, Calendar, MapPin, Clock, LogOut, User
 } from "lucide-react";
-import { getFormationsByCategorie, getFormationDetails, startStripePayment, getCurrentUser } from "../data/authService";
+import PayPalPart from "./Paypal";
 
-// --- STYLES POUR LE DESIGN (On lie les noms du Back aux icônes) ---
 const CATEGORIES_STYLES = {
     "Front-End": { icon: LayoutTemplate, color: "text-blue-400", bg: "bg-blue-500/20", sub: "Interfaces & UX" },
     "Back-End": { icon: Server, color: "text-green-400", bg: "bg-green-500/20", sub: "Logique & Data" },
@@ -17,38 +15,51 @@ const CATEGORIES_STYLES = {
 };
 
 export default function Formation() {
-    // --- ÉTATS ---
     const [backendFormations, setBackendFormations] = useState([]);
     const [backendSessions, setBackendSessions] = useState([]);
     const [availableCategories, setAvailableCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState(null);
     const [selectedTech, setSelectedTech] = useState(null);
     const [selectedSessionId, setSelectedSessionId] = useState(null);
-    const [isPaying, setIsPaying] = useState(false);
+    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // --- RÉFÉRENCES ---
     const techGridRef = useRef(null);
     const detailsRef = useRef(null);
 
-    // --- CHARGEMENT DES DONNÉES DEPUIS LE BACKEND (Docker) ---
+    const handleLogout = () => {
+        localStorage.removeItem('authData');
+        localStorage.removeItem('user');
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        alert("Vous êtes déconnecté.");
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const authData = localStorage.getItem('authData');
-                if (!authData) return;
+                const userData = localStorage.getItem('user');
+                
+                if (authData) {
+                    setIsAuthenticated(true);
+                    if (userData) setCurrentUser(JSON.parse(userData));
+                }
 
-                const headers = {
+                const headers = authData ? {
                     "Content-Type": "application/json",
                     "Authorization": `Basic ${authData}`
-                };
+                } : { "Content-Type": "application/json" };
 
-                // ✅ Appel aux nouveaux endpoints : /api/formations et /api/sessions
                 const [formationsRes, sessionsRes] = await Promise.all([
                     fetch("http://localhost:8080/api/formations", { headers }),
                     fetch("http://localhost:8080/api/sessions", { headers })
                 ]);
 
-                if (!formationsRes.ok || !sessionsRes.ok) throw new Error("Accès refusé par le serveur");
+                if (!formationsRes.ok || !sessionsRes.ok) {
+                    return; 
+                }
 
                 const formationsData = await formationsRes.json();
                 const sessionsData = await sessionsRes.json();
@@ -56,19 +67,17 @@ export default function Formation() {
                 setBackendFormations(formationsData);
                 setBackendSessions(sessionsData);
 
-                // ✅ Extraction dynamique des catégories uniques du back
                 const uniqueCats = [...new Set(formationsData.map(f => f.categorie))];
                 setAvailableCategories(uniqueCats);
                 if (uniqueCats.length > 0 && !activeCategory) setActiveCategory(uniqueCats[0]);
 
             } catch (error) {
-                console.error("Erreur de liaison Docker:", error.message);
+                console.error(error);
             }
         };
         fetchData();
     }, []);
 
-    // Effet : Scroll vers les détails quand une techno est choisie
     useEffect(() => {
         if (selectedTech && detailsRef.current) {
             setTimeout(() => {
@@ -77,24 +86,34 @@ export default function Formation() {
         }
     }, [selectedTech]);
 
-    // --- FILTRAGE DES DONNÉES ---
+    const handleSuccess = () => {
+        setSelectedSessionId(null);
+        setSelectedTech(null);
+    };
+
     const activeStyle = CATEGORIES_STYLES[activeCategory] || CATEGORIES_STYLES["Default"];
     const filteredFormations = backendFormations.filter(f => f.categorie === activeCategory);
     const filteredSessions = backendSessions.filter(s => s.formation?.id === selectedTech?.id);
 
-    const handlePayment = () => {
-        setIsPaying(true);
-        setTimeout(() => {
-            alert(`Redirection vers paiement sécurisé pour ${selectedTech.titre} (${selectedTech.prix}€)`);
-            setIsPaying(false);
-        }, 1500);
-    };
-
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30 relative">
             <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
 
-            {/* --- HERO SECTION --- */}
+            {/* J'ai changé top-6 en top-28 pour descendre le bloc sous ta navbar */}
+            <div className="absolute top-28 right-10 flex gap-4 z-50">
+                {isAuthenticated ? (
+                    <div className="flex items-center gap-4 bg-[#0a0a0a] px-4 py-2 rounded-full border border-white/20 shadow-xl">
+                        <div className="flex items-center gap-2 text-sm text-indigo-300">
+                            <User size={16}/> 
+                            <span className="font-bold">{currentUser?.pseudo || "Utilisateur"}</span>
+                        </div>
+                        <button onClick={handleLogout} className="text-xs bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-3 py-1 rounded transition-all flex items-center gap-1">
+                            <LogOut size={12}/>
+                        </button>
+                    </div>
+                ) : null} 
+            </div>
+
             <header className="text-center px-20 mb-20">
                 <h1 className="mt-14 font-bold text-9xl text-white tracking-tighter italic uppercase">Novatio</h1>
                 <p className="text-gray-400 max-w-2xl mx-auto text-2xl mt-4">
@@ -102,7 +121,6 @@ export default function Formation() {
                 </p>
             </header>
 
-            {/* --- ÉTAPE 1 : CARROUSEL CATÉGORIES DYNAMIQUES --- */}
             <section className="mb-20">
                 <div className="text-center mb-8">
                     <span className="text-xl font-bold text-blue-400 uppercase tracking-widest">Étape 1</span>
@@ -130,7 +148,6 @@ export default function Formation() {
                 </div>
             </section>
 
-            {/* --- ÉTAPE 2 : GRILLE FORMATIONS RÉELLES --- */}
             <section ref={techGridRef} className="max-w-5xl mx-auto px-4 mb-20 min-h-[300px]">
                 <div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-500">
                     <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Étape 2</span>
@@ -152,7 +169,6 @@ export default function Formation() {
                 </div>
             </section>
 
-            {/* --- ÉTAPE 3 : DÉTAILS & PAIEMENT --- */}
             {selectedTech && (
                 <section ref={detailsRef} className="max-w-6xl mx-auto px-4 py-12 border-t border-white/10 bg-[#0a0a0a] animate-in slide-in-from-bottom-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -167,11 +183,14 @@ export default function Formation() {
                             </div>
                         </div>
 
-                        {/* COLONNE SESSIONS (LIEUX / SALLES RÉELS) */}
                         <div className="lg:col-span-1">
                             <div className="glass-card p-6 rounded-xl border border-white/5">
                                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2 italic uppercase tracking-tighter">
                                     <Calendar size={18} className="text-indigo-500" /> Prochaines Sessions
+                                    {/* Pour debug : Afficher si on est connecté */}
+                                    <span className={`text-[10px] ml-auto px-2 py-1 rounded ${isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                        {isAuthenticated ? 'Connecté' : 'Non connecté'}
+                                    </span>
                                 </h3>
 
                                 <div className="space-y-3">
@@ -189,10 +208,32 @@ export default function Formation() {
 
                                 {selectedSessionId && (
                                     <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-2">
-                                        <button onClick={handlePayment} className="w-full py-4 rounded-xl bg-white text-black font-black uppercase italic tracking-widest hover:bg-gray-200 transition-all shadow-xl flex justify-center items-center gap-2">
-                                            <Lock size={14}/> Payer {selectedTech.prix}€
-                                        </button>
-                                        <p className="text-[10px] text-gray-500 text-center mt-3">Novatio Security v2.0</p>
+                                        {!isAuthenticated ? (
+                                            <div className="text-center p-6 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                                <Lock className="mx-auto mb-3 text-red-400" size={32} />
+                                                <h3 className="text-lg font-bold text-red-400 mb-2">CONNEXION REQUISE</h3>
+                                                <p className="text-sm text-gray-300 mb-4">
+                                                    Vous devez être connecté pour réserver.
+                                                </p>
+                                                <a href="/connexion" className="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors uppercase text-sm tracking-wider">
+                                                    Se connecter
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="mb-4 text-center">
+                                                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Paiement Sécurisé</span>
+                                                    <p className="text-[10px] text-gray-500">Montant test : {selectedTech.prix}€</p>
+                                                </div>
+                                                
+                                                <PayPalPart 
+                                                    prix={selectedTech.prix}
+                                                    titre={selectedTech.titre}
+                                                    sessionId={selectedSessionId}
+                                                    onSuccess={handleSuccess}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>
