@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// REMARQUEZ : J'ai supprimé 'useLocation' de l'import ci-dessous
 import { useNavigate } from "react-router-dom"; 
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { SocialButtons, Divider } from "../component/AuthComponents.jsx"; 
@@ -7,9 +6,6 @@ import { SocialButtons, Divider } from "../component/AuthComponents.jsx";
 const Login = () => {
     const navigate = useNavigate();
     
-    // PLUS DE LOCATION, PLUS DE DESTINATION, PLUS DE MÉMOIRE.
-    // Le composant est obligé de suivre nos ordres maintenant.
-
     const [pseudo, setPseudo] = useState("");
     const [motDePasse, setMotDePasse] = useState("");
     const [error, setError] = useState(null);
@@ -29,10 +25,8 @@ const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 
-                // Normalisation du rôle
                 let userRole = data.role ? data.role.toUpperCase() : "APPRENTI";
                 
-                // Si le rôle n'est pas Admin/Prof, c'est forcément un Apprenti
                 if (userRole !== "ADMIN" && userRole !== "INTERVENANT") {
                     userRole = "APPRENTI";
                 }
@@ -43,13 +37,11 @@ const Login = () => {
 
                 console.log("Rôle final :", userRole);
 
-                // --- REDIRECTION EN DUR (HARDCODED) ---
                 if (userRole === "ADMIN") {
                     navigate("/admin");
                 } else if (userRole === "INTERVENANT") {
                     navigate("/intervenant");
                 } else {
-                    // C'EST ICI. Il est IMPOSSIBLE d'aller ailleurs que sur dashboard.
                     console.log("GO -> /dashboard");
                     navigate("/dashboard");
                 }

@@ -36,10 +36,9 @@ const AdminDashboard = () => {
     load();
   }, [navigate]);
 
-  // --- LOGOUT ---
+  // --- deconnexion
   const handleLogout = () => { localStorage.clear(); navigate('/connexion'); };
 
-  // Handlers Création
   const onAddProf = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const payload = { nom: fd.get("nom"), prenom: fd.get("prenom"), email: fd.get("email"), motDePasse: fd.get("mdp"), role: "INTERVENANT" }; try { const res = await createIntervenant(payload); setProfs([...profs, res]); setModal({ type: null }); alert(`Intervenant créé ! Login : ${res.pseudo}`); } catch (error) { alert("Erreur création."); } };
   const onAddFormation = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const payload = { titre: fd.get("titre"), categorie: fd.get("cat"), dureeHeures: parseInt(fd.get("duree")), prix: parseFloat(fd.get("prix")) }; const res = await createFormation(payload); setFormations([...formations, res]); setModal({ type: null }); };
   const onAddSession = async (e) => { e.preventDefault(); const fd = new FormData(e.target); const payload = { dateDebut: fd.get("debut"), dateFin: fd.get("fin"), lieu: fd.get("lieu"), salle: fd.get("salle"), horaires: fd.get("horaires"), formation: { id: parseInt(fd.get("fId")) }, intervenant: { id: parseInt(fd.get("pId")) } }; const res = await createSession(payload); setSessions([...sessions, res]); setModal({ type: null }); };
@@ -53,7 +52,7 @@ const AdminDashboard = () => {
             <button onClick={() => setModal({type:'prof'})} className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-lg text-xs font-bold transition"> + INTERVENANT</button>
             <button onClick={() => setModal({type:'formation'})} className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-lg text-xs font-bold transition"> + FORMATION</button>
             <button onClick={() => setModal({type:'session'})} className="bg-indigo-600 hover:bg-indigo-500 px-5 py-2 rounded-lg text-xs font-bold shadow-lg shadow-indigo-500/20 transition"> NOUVELLE SESSION</button>
-            {/* BOUTON LOGOUT */}
+            {/* BOUTON déco */}
             <button onClick={handleLogout} className="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-lg ml-2 transition"><LogOut size={20} /></button>
           </div>
         </header>
@@ -102,7 +101,7 @@ const AdminDashboard = () => {
                 <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg">CRÉER</button>
               </form>
             )}
-            {/* (Le reste des formulaires Formation et Session reste identique à ton code original) */}
+            {/* (Le reste des formulaires Formation et Session reste la même) */}
             {modal.type === 'formation' && (<form onSubmit={onAddFormation} className="space-y-4"><input name="titre" placeholder="Titre de la formation" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/><div className="grid grid-cols-3 gap-2"><input name="cat" placeholder="Cat." className="bg-zinc-900 p-3 rounded-lg border border-zinc-800"/><input name="duree" type="number" placeholder="Heures" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800"/><input name="prix" type="number" step="0.01" placeholder="Prix €" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/></div><button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg">AJOUTER</button></form>)}
             {modal.type === 'session' && (<form onSubmit={onAddSession} className="space-y-3"><select name="fId" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required><option value="">Sélectionner Formation</option>{formations.map(f => <option key={f.id} value={f.id}>{f.titre}</option>)}</select><select name="pId" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required><option value="">Attribuer Intervenant</option>{profs.map(p => <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>)}</select><div className="grid grid-cols-2 gap-2"><input name="debut" type="date" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800 text-xs" required/><input name="fin" type="date" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800 text-xs" required/></div><div className="grid grid-cols-2 gap-2"><input name="lieu" placeholder="Lieu" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800 text-xs" required/><input name="salle" placeholder="Salle" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800 text-xs" required/></div><input name="horaires" placeholder="Ex: 09:00 - 17:00" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800 text-xs" required/><button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg mt-4">PLANIFIER</button></form>)}
           </div>

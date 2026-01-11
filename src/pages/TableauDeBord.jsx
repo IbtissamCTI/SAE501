@@ -8,5 +8,6 @@ function TableauDeBord() {
 		</div>
 	);
 }
+// Autre approche niveau interface -> non utilisé 
 
 export default TableauDeBord;

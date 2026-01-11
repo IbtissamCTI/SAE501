@@ -3,7 +3,6 @@ import { Instagram, Linkedin, Youtube, School, Twitter, Facebook } from "lucide-
 import { Link } from "react-router-dom";
 
 function Footer() {
-    // Contenu adapté à Novatio (École de code)
     const footerLinks = [
         {
             title: "Nos Formations",
@@ -41,9 +40,7 @@ function Footer() {
         <footer className="bg-black text-white py-20 px-6 font-sans border-t border-white/5">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-12">
                 
-                {/* Colonne 1 : Identité & Réseaux */}
                 <div className="md:col-span-2 flex flex-col gap-6 pr-4">
-                    {/* Logo */}
                     <Link to="/" className="flex items-center gap-2.5 w-fit hover:opacity-80 transition">
                         <div className="bg-indigo-600 p-2 rounded-lg">
                             <School className="h-6 w-6 text-white" fill="currentColor" />
@@ -53,13 +50,11 @@ function Footer() {
                         </span>
                     </Link>
 
-                    {/* Slogan */}
                     <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
                         L'école qui transforme votre passion pour le code en carrière d'excellence. 
                         Rejoignez la prochaine promotion et construisez le futur.
                     </p>
 
-                    {/* Réseaux Sociaux */}
                     <div className="flex items-center gap-5 mt-2">
                         <a href="#" className="text-gray-400 hover:text-indigo-400 transition-colors">
                             <Twitter size={20} />
@@ -76,7 +71,6 @@ function Footer() {
                     </div>
                 </div>
 
-                {/* Colonnes de liens dynamiques */}
                 {footerLinks.map((column, index) => (
                     <div key={index} className="flex flex-col gap-4">
                         <h3 className="font-bold text-white text-base">
@@ -98,7 +92,6 @@ function Footer() {
                 ))}
             </div>
 
-            {/* Copppppgerfright */}
             <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/10 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-gray-600">
                 <p>&copy; {new Date().getFullYear()} Novatio School. Tous droits réservés.</p>
                 <div className="flex gap-4 mt-4 md:mt-0">

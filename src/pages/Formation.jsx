@@ -3,7 +3,7 @@ import {
     Atom, Server, Layers, BarChart, Cloud, Database, LayoutTemplate,
     CheckCircle, Lock, Calendar, MapPin, Clock, LogOut, User
 } from "lucide-react";
-import PayPalPart from "./PaypalPart"; // Assurez-vous que ce fichier existe
+import PayPalPart from "./PaypalPart"; 
 
 const CATEGORIES_STYLES = {
     "Front-End": { icon: LayoutTemplate, color: "text-blue-400", bg: "bg-blue-500/20", sub: "Interfaces & UX" },
@@ -34,12 +34,12 @@ export default function Formation() {
         setIsAuthenticated(false);
         setCurrentUser(null);
         alert("Vous êtes déconnecté.");
-        window.location.reload(); // Pour nettoyer proprement les états
+        window.location.reload(); 
     };
 
     useEffect(() => {
         const fetchData = async () => {
-            // 1. Gestion de l'Authentification locale
+            
             const authData = localStorage.getItem('authData');
             const userData = localStorage.getItem('user');
             
@@ -54,25 +54,23 @@ export default function Formation() {
                 }
             }
 
-            // 2. Préparation des headers
+         
             const headers = { "Content-Type": "application/json" };
             if (authData) {
                 headers["Authorization"] = `Basic ${authData}`;
             }
 
             try {
-                // --- FETCH 1 : FORMATIONS (Souvent public) ---
+                
                 const formationsRes = await fetch("http://localhost:8080/api/formations", { headers });
                 
                 if (formationsRes.ok) {
                     const formationsData = await formationsRes.json();
                     setBackendFormations(formationsData);
 
-                    // Calcul des catégories uniques
                     const uniqueCats = [...new Set(formationsData.map(f => f.categorie))];
                     setAvailableCategories(uniqueCats);
                     
-                    // Sélectionner la première catégorie par défaut si aucune n'est active
                     if (uniqueCats.length > 0 && !activeCategory) {
                         setActiveCategory(uniqueCats[0]);
                     }
@@ -80,8 +78,6 @@ export default function Formation() {
                     console.error("Erreur chargement formations:", formationsRes.status);
                 }
 
-                // --- FETCH 2 : SESSIONS (Peut nécessiter Auth) ---
-                // On sépare le try/catch pour que les formations s'affichent même si les sessions plantent (401)
                 try {
                     const sessionsRes = await fetch("http://localhost:8080/api/sessions", { headers });
                     
@@ -89,7 +85,6 @@ export default function Formation() {
                         const sessionsData = await sessionsRes.json();
                         setBackendSessions(sessionsData);
                     } else {
-                        // Si 401 Unauthorized ou 403 Forbidden, on met une liste vide sans planter
                         console.warn(`Sessions non accessibles (Status: ${sessionsRes.status}). Connectez-vous pour voir les dates.`);
                         setBackendSessions([]);
                     }
@@ -104,10 +99,8 @@ export default function Formation() {
         };
 
         fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // On ne met pas activeCategory ici pour éviter une boucle infinie
+    }, []); 
 
-    // Scroll automatique vers les détails
     useEffect(() => {
         if (selectedTech && detailsRef.current) {
             setTimeout(() => {
@@ -124,12 +117,9 @@ export default function Formation() {
 
     const activeStyle = CATEGORIES_STYLES[activeCategory] || CATEGORIES_STYLES["Default"];
     
-    // Filtrage des données
     const filteredFormations = backendFormations.filter(f => f.categorie === activeCategory);
     
-    // On filtre les sessions liées à la formation sélectionnée
     const filteredSessions = backendSessions.filter(s => 
-        // Vérification robuste : s.formation peut être null ou undefined
         s.formation && selectedTech && s.formation.id === selectedTech.id
     );
 
@@ -137,7 +127,7 @@ export default function Formation() {
         <div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30 relative">
             <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
 
-            {/* Barre utilisateur (Top Right) */}
+           
             <div className="absolute top-28 right-10 flex gap-4 z-50">
                 {isAuthenticated && (
                     <div className="flex items-center gap-4 bg-[#0a0a0a] px-4 py-2 rounded-full border border-white/20 shadow-xl">
@@ -159,7 +149,6 @@ export default function Formation() {
                 </p>
             </header>
 
-            {/* SECTION 1 : CATÉGORIES */}
             <section className="mb-20">
                 <div className="text-center mb-8">
                     <span className="text-xl font-bold text-blue-400 uppercase tracking-widest">Étape 1</span>
@@ -189,7 +178,6 @@ export default function Formation() {
                 </div>
             </section>
 
-            {/* SECTION 2 : LISTE DES FORMATIONS */}
             <section ref={techGridRef} className="max-w-5xl mx-auto px-4 mb-20 min-h-[300px]">
                 <div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-500">
                     <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Étape 2</span>
@@ -211,7 +199,6 @@ export default function Formation() {
                 </div>
             </section>
 
-            {/* SECTION 3 : DÉTAILS ET SESSIONS */}
             {selectedTech && (
                 <section ref={detailsRef} className="max-w-6xl mx-auto px-4 py-12 border-t border-white/10 bg-[#0a0a0a] animate-in slide-in-from-bottom-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -227,7 +214,6 @@ export default function Formation() {
                             </div>
                         </div>
 
-                        {/* Droite : Sessions & Paiement */}
                         <div className="lg:col-span-1">
                             <div className="glass-card p-6 rounded-xl border border-white/5">
                                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2 italic uppercase tracking-tighter">

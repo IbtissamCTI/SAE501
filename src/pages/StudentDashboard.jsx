@@ -7,7 +7,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 
-// --- STYLES ---
 const styles = {
     card: "bg-[#0A0A0C] border border-[#1F1F23] rounded-3xl p-6 shadow-lg hover:shadow-xl hover:shadow-[#5B4DFF]/5 transition-all duration-300",
     buttonPrimary: "bg-white text-[#5B4DFF] px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-100 transition shadow-lg active:scale-95",
@@ -16,7 +15,6 @@ const styles = {
     tabButton: (isActive) => `pb-3 font-bold capitalize transition whitespace-nowrap ${isActive ? "text-[#5B4DFF] border-b-2 border-[#5B4DFF]" : "text-gray-500 hover:text-white"}`,
 };
 
-// --- UTILITAIRES ---
 const getSessionStatus = (dateSession) => {
     const now = new Date();
     const sessionDate = new Date(dateSession);
@@ -199,7 +197,6 @@ const VueDashboard = ({ nextSession, handleEmargement, hasSigned, triggerNotific
                         </div>
                     </div>
                     <div className="text-center mb-6"><p className="text-sm text-gray-300 font-medium mb-1">{lastResult.module}</p><p className="text-xs text-[#34D399] bg-[#34D399]/10 py-1 px-2 rounded inline-block border border-[#34D399]/20">{lastResult.feedback}</p></div>
-                    {/* BOUTON ATTESTATION AVEC LE NOM CORRIGÉ */}
                     <button 
                         onClick={() => generateCertificate(studentInfo.name, lastResult.module)} 
                         className={styles.buttonAction}
@@ -215,7 +212,6 @@ const VueDashboard = ({ nextSession, handleEmargement, hasSigned, triggerNotific
 
 const VuePlanning = ({ showCalendar, setShowCalendar, upcomingSessions }) => (<div className="animate-in fade-in"><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-white">Mon Planning (Tout)</h2><button onClick={() => setShowCalendar(!showCalendar)} className="flex items-center gap-2 bg-[#1F1F23] px-4 py-2 rounded-xl text-sm font-bold text-[#A78BFA] hover:text-white transition border border-[#1F1F23] hover:border-[#5B4DFF]">{showCalendar ? <><List size={16} /> Vue Liste</> : <><Grid size={16} /> Vue Calendrier</>}</button></div>{showCalendar ? (<div className={styles.card}><div className="grid grid-cols-7 gap-4 mb-4 text-center text-gray-500 font-bold uppercase text-xs"><div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div></div><div className="grid grid-cols-7 gap-4">{Array.from({ length: 31 }, (_, i) => { const day = i + 1; const session = upcomingSessions.find(s => s.day === day); return (<div key={day} className={`min-h-[100px] p-3 rounded-2xl border ${session ? "bg-[#2D1B4E]/50 border-[#5B4DFF]/50 shadow-[inset_0_0_20px_rgba(91,77,255,0.1)]" : "bg-[#1F1F23]/50 border-transparent"} relative group transition-all hover:bg-[#1F1F23]`}> <span className={`text-sm font-bold ${session ? "text-white" : "text-gray-600"}`}>{day}</span>{session && (<div className="mt-2"><div className="text-[10px] font-bold text-[#A78BFA] bg-[#2D1B4E] px-1.5 py-0.5 rounded w-fit mb-1">{session.time}</div><div className="text-xs font-bold text-white leading-tight truncate">{session.title}</div></div>)}</div>); })}</div></div>) : (<div className="grid gap-4">{upcomingSessions.map((session) => (<div key={session.id} className={`${styles.card} flex justify-between items-center hover:border-[#5B4DFF]/50`}><div className="flex items-center gap-4"><div className="bg-[#1F1F23] p-3 rounded-xl text-[#5B4DFF]"><Calendar size={24} /></div><div><h4 className="font-bold text-white text-lg">{session.title}</h4><p className="text-gray-400 text-sm flex items-center gap-2"><Clock size={14} /> {session.date} • {session.time}</p></div></div><div className="text-right"><span className={`text-sm font-bold px-3 py-1 rounded-lg border ${session.statusInfo.style}`}>{session.statusInfo.label}</span></div></div>))}</div>)}</div>);
 
-// VUE HISTORY MODIFIÉE POUR PRENDRE LE NOM
 const VueHistory = ({ history, studentName }) => (
     <div className="animate-in fade-in">
         <h2 className="text-2xl font-bold text-white mb-6">Historique complet</h2>
@@ -286,11 +282,8 @@ const StudentDashboard = () => {
             let user = {};
             try { user = JSON.parse(userStr); } catch (e) { console.error(e); }
             
-            // --- DEBUG : REGARDEZ LA CONSOLE POUR VOIR LE CONTENU DU USER ---
             console.log("USER CHARGÉ DU STORAGE :", user);
 
-            // --- CORRECTION DU NOM ---
-            // On vérifie si prenom et nom existent, sinon on prend le pseudo, sinon "Apprenti"
             let fullName = "Apprenti";
             if (user.prenom && user.nom) {
                 fullName = `${user.prenom} ${user.nom}`;
@@ -304,7 +297,6 @@ const StudentDashboard = () => {
                 avatar: (user.prenom || user.pseudo || "A").charAt(0).toUpperCase()
             });
 
-            // Chargement des sessions
             const authData = localStorage.getItem("authData");
             const userId = user.id || user.idUser || user.id_user;
             if (!userId) return;
@@ -381,7 +373,6 @@ const StudentDashboard = () => {
                 {activeTab === "dashboard" && <VueDashboard nextSession={nextSession} handleEmargement={handleEmargement} hasSigned={hasSigned} triggerNotification={triggerNotification} navigateTab={setActiveTab} upcomingSessions={upcomingSessions} history={history} lastResult={lastResult} chartData={chartData} studentInfo={studentInfo} />}
                 {activeTab === "planning" && <VuePlanning showCalendar={showCalendar} setShowCalendar={setShowCalendar} upcomingSessions={upcomingSessions} />}
                 
-                {/* On passe bien le nom calculé au composant History */}
                 {activeTab === "history" && <VueHistory history={history} studentName={studentInfo.name} />}
                 
                 {activeTab === "messages" && <VueMessages contacts={contacts} selectedContact={selectedContact} setSelectedContact={setSelectedContact} messageInput={messageInput} setMessageInput={setMessageInput} handleSendMessage={handleSendMessage} triggerNotification={triggerNotification} />}

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Star, User, Shield, Briefcase, ArrowRight, ArrowLeft, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-// --- COMPOSANT LAYOUT (PARTIE GAUCHE FIXE - TON DESIGN) ---
 const AuthLayout = ({ children }) => {
     return (
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
@@ -10,7 +9,6 @@ const AuthLayout = ({ children }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
             <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative z-10 min-h-[600px]">
-                {/* GAUCHE : Fixe */}
                 <div className="hidden md:flex md:w-1/2 p-12 flex-col justify-between bg-zinc-900/50 border-r border-white/5 relative">
                     <div className="z-10">
                         <Link to="/" className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
@@ -39,7 +37,6 @@ const AuthLayout = ({ children }) => {
                     <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none"></div>
                 </div>
 
-                {/* DROITE : Dynamique */}
                 <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-black/80 relative">
                     {children}
                 </div>
@@ -48,25 +45,19 @@ const AuthLayout = ({ children }) => {
     );
 };
 
-// --- COMPOSANT PRINCIPAL ---
 const Connexion = () => {
-    // État pour savoir si on est sur la vue "SELECTION" ou "LOGIN"
-    const [view, setView] = useState("selection"); // 'selection' ou 'login'
+    const [view, setView] = useState("selection");
     
-    // On garde ces états pour l'affichage du titre (ex: "Accès : Espace Élève")
     const [roleTarget, setRoleTarget] = useState("/dashboard"); 
     const [roleName, setRoleName] = useState("Élève");
 
     const navigate = useNavigate();
 
-    // Etats du formulaire
     const [pseudo, setPseudo] = useState("");
     const [motDePasse, setMotDePasse] = useState("");
     const [error, setError] = useState(null);
 
-    // Fonction quand on clique sur une carte (Choix du rôle)
     const handleChoice = (path, name) => {
-        // Astuce : même si on clique sur étudiant, on force le chemin vers dashboard en interne pour plus tard
         const realPath = path === "/student" || path === "/eleve" ? "/dashboard" : path;
         
         setRoleTarget(realPath);
@@ -75,14 +66,12 @@ const Connexion = () => {
         setError(null);
     };
 
-    // --- LA LOGIQUE RÉPARÉE EST ICI ---
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
         console.log("Tentative de connexion...");
 
         try {
-            // 1. Appel au Backend Java
             const response = await fetch("http://localhost:8080/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -92,27 +81,22 @@ const Connexion = () => {
             if (response.ok) {
                 const data = await response.json();
 
-                // 2. Normalisation du rôle
                 let userRole = data.role ? data.role.toUpperCase() : "APPRENTI";
-                // Sécurité : Si ce n'est pas un admin ou un prof, on considère que c'est un élève
                 if (userRole !== "ADMIN" && userRole !== "INTERVENANT") {
                     userRole = "APPRENTI";
                 }
 
-                // 3. Sauvegarde dans le navigateur
                 const userToSave = { ...data, role: userRole };
                 localStorage.setItem("user", JSON.stringify(userToSave));
                 localStorage.setItem("authData", window.btoa(pseudo + ":" + motDePasse));
 
                 console.log("Connecté en tant que :", userRole);
 
-                // 4. REDIRECTION CORRECTE (On ignore le choix visuel, on fait confiance au backend)
                 if (userRole === "ADMIN") {
                     navigate("/admin");
                 } else if (userRole === "INTERVENANT") {
                     navigate("/intervenant");
                 } else {
-                    // C'est ici la correction importante :
                     console.log("Redirection vers le dashboard Apprenti");
                     navigate("/dashboard");
                 }
@@ -131,14 +115,12 @@ const Connexion = () => {
         <AuthLayout>
             <div className="max-w-sm mx-auto w-full transition-all duration-500 ease-in-out">
                 
-                {/* --- VUE 1 : SÉLECTION DU RÔLE --- */}
                 {view === "selection" && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                         <h2 className="text-3xl font-bold mb-2 text-white">Bienvenue</h2>
                         <p className="text-gray-400 mb-8 text-sm">Choisissez votre espace pour continuer.</p>
 
                         <div className="space-y-4">
-                            {/* Bouton Élève corrigé (visuellement identique, mais prépare le bon chemin) */}
                             <button onClick={() => handleChoice("/dashboard", "Espace Élève")} className="w-full flex items-center justify-between p-4 rounded-xl bg-[#1F1F23] border border-white/10 hover:border-indigo-500 hover:bg-[#27272A] transition group text-left">
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition"><User size={20} /></div>
@@ -171,7 +153,6 @@ const Connexion = () => {
                     </div>
                 )}
 
-                {/* --- VUE 2 : FORMULAIRE DE CONNEXION --- */}
                 {view === "login" && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                         <button onClick={() => setView("selection")} className="flex items-center gap-2 text-gray-500 hover:text-white mb-6 text-sm transition">

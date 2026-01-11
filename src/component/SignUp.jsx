@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
 
-// --- 1. COMPOSANT AUTHLAYOUT (Ton design intact) ---
 const AuthLayout = ({ title, subtitle, children, footerText, footerActionText, footerActionLink }) => {
     return (
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
             <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative z-10">
-                {/* GAUCHE: Déco */}
                 <div className="hidden md:flex md:w-1/2 p-12 flex-col justify-between bg-zinc-900/50 border-r border-white/5">
                     <Link to="/" className="text-2xl font-bold text-white flex items-center gap-2">
                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-mono">N</div>
@@ -21,7 +19,6 @@ const AuthLayout = ({ title, subtitle, children, footerText, footerActionText, f
                         <p className="text-lg text-gray-200 italic">"La meilleure plateforme pour apprendre le dev."</p>
                     </div>
                 </div>
-                {/* DROITE: Formulaire */}
                 <div className="w-full md:w-1/2 p-8 md:p-12 bg-black/80">
                     <h2 className="text-3xl font-bold mb-2">{title}</h2>
                     <p className="text-gray-400 mb-8 text-sm">{subtitle}</p>
@@ -35,14 +32,12 @@ const AuthLayout = ({ title, subtitle, children, footerText, footerActionText, f
     );
 };
 
-// --- 2. COMPOSANT SIGNUP (Logique corrigée + Ton style) ---
 const SignUp = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
-    // ✅ J'ai remis 'pseudo' car ton backend renvoyait une erreur sans lui
     const [formData, setFormData] = useState({
         prenom: "",
         nom: "",
@@ -62,7 +57,6 @@ const SignUp = () => {
         setError(null);
         setSuccess(false);
 
-        // Validation simple
         if (!formData.prenom || !formData.nom || !formData.pseudo || !formData.email || !formData.motDePasse) {
             setError("Tous les champs sont obligatoires.");
             setLoading(false);
@@ -70,7 +64,6 @@ const SignUp = () => {
         }
 
         try {
-            // ✅ Envoi au backend avec le pseudo
             const response = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -84,9 +77,8 @@ const SignUp = () => {
 
             setSuccess(true);
             
-            // Redirection après 1.5 secondes
             setTimeout(() => {
-                navigate("/connexion"); // Ou /login selon ta route
+                navigate("/connexion");
             }, 1500);
 
         } catch (err) {
@@ -106,17 +98,15 @@ const SignUp = () => {
             footerActionLink="/connexion"
         >
             <form className="space-y-4" onSubmit={handleSignUp}>
-                {/* Message d'erreur */}
                 {error && (
                     <div className="bg-red-500/10 border border-red-500 rounded-xl p-3 text-sm text-red-400">
-                        ⚠️ {error}
+                         {error}
                     </div>
                 )}
 
-                {/* Message de succès */}
                 {success && (
                     <div className="bg-green-500/10 border border-green-500 rounded-xl p-3 text-sm text-green-400">
-                        ✅ Compte créé avec succès ! Redirection...
+                         Compte créé avec succès ! Redirection...
                     </div>
                 )}
 
@@ -143,7 +133,6 @@ const SignUp = () => {
                     />
                 </div>
 
-                {/* Champ Pseudo réintégré avec ton style */}
                 <input
                     name="pseudo"
                     value={formData.pseudo}

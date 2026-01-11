@@ -8,5 +8,6 @@ function MesCours() {
 		</div>
 	);
 }
+// Autre approche niveau interface -> non utilisé 
 
 export default MesCours;

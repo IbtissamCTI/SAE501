@@ -7,7 +7,6 @@ function App() {
     const location = useLocation();
     const cheminActuel = location.pathname;
 
-    // Gestion du Scroll automatique
     useEffect(() => {
         if (location.hash) {
             const idElement = location.hash.slice(1);
@@ -22,30 +21,25 @@ function App() {
         }
     }, [location]);
 
-    // --- LOGIQUE D'AFFICHAGE ---
     
-    // Liste des pages "Plein écran" (Sans Header/Footer global)
     const pagesPleinEcran = [
         "/connexion", 
         "/inscription", 
-        "/dashboard",   // Apprenti
-        "/intervenant", // Prof
-        "/admin"        // Admin
+        "/dashboard",   
+        "/intervenant", 
+        "/admin"        
     ];
     
     const estPleinEcran = pagesPleinEcran.some(page => cheminActuel.startsWith(page));
 
     return (
         <>
-            {/* On cache le Header sur les dashboards et le login */}
             {!estPleinEcran && <Header />}
 
             <main>
-                {/* C'est ici que s'affichent les pages du Router */}
                 <Outlet />
             </main>
 
-            {/* On cache le Footer sur les dashboards et le login */}
             {!estPleinEcran && <Footer />}
         </>
     );

@@ -7,6 +7,7 @@ function MonProfil() {
 			<p>Les informations de votre profil s'afficheront ici.</p>
 		</div>
 	);
-}
+}// Autre approche niveau interface -> non utilisé 
+
 
 export default MonProfil;

@@ -11,22 +11,17 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// --- IMPORTS 3D ---
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, Stage } from "@react-three/drei";
 
 function Model() {
-    // Si vous n'avez pas encore le fichier, commentez la ligne suivante et décommentez le cube plus bas pour tester
     const { scene } = useGLTF("/sallefinale.glb"); 
     return <primitive object={scene} />;
-    
-    // Fallback (cube) pour tester si vous n'avez pas encore converti le fichier .blend
-    // return <mesh><boxGeometry args={[2, 2, 2]} /><meshStandardMaterial color="#431EA7" /></mesh>;
 }
 
 function Acceuil() {
     const [questionOuverte, setQuestionOuverte] = useState(null);
-    const [isSalleOpen, setIsSalleOpen] = useState(false); // État pour la popup 3D
+    const [isSalleOpen, setIsSalleOpen] = useState(false);
     const navigate = useNavigate();
 
     const gererClickFAQ = (index) => {
@@ -94,12 +89,10 @@ function Acceuil() {
 
     return (
         <>
-            {/* --- POPUP 3D (MODALE) --- */}
             {isSalleOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="relative w-[90vw] h-[80vh] bg-[#0A0A0C] border border-[#2F008D] rounded-3xl shadow-[0_0_50px_rgba(67,30,167,0.3)] overflow-hidden flex flex-col">
                         
-                        {/* Header de la modale */}
                         <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10 bg-gradient-to-b from-black/80 to-transparent">
                             <div>
                                 <h3 className="text-2xl font-bold text-white">Nos Locaux</h3>
@@ -113,7 +106,6 @@ function Acceuil() {
                             </button>
                         </div>
 
-                        {/* Canvas 3D */}
                         <div className="w-full h-full cursor-move">
                             <Canvas shadows dpr={[1, 2]} camera={{ fov: 50, position: [0, 2, 10] }}>
                                 <Suspense fallback={null}>
@@ -124,7 +116,6 @@ function Acceuil() {
                                 <OrbitControls autoRotate autoRotateSpeed={0.5} />
                             </Canvas>
                             
-                            {/* Overlay de chargement si nécessaire */}
                             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none">
                                 <span className="text-xs font-bold text-[#8D83E0] uppercase tracking-widest bg-black/50 px-4 py-2 rounded-full border border-[#2F008D]">
                                     Modèle 3D Interactif
@@ -171,7 +162,7 @@ function Acceuil() {
 
                 <div className="flex gap-8 justify-center">
                     <button
-                        onClick={() => navigate('/formations')} // ✅ Redirection activée
+                        onClick={() => navigate('/formations')}
                         className="mt-10 text-white px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg"
                         style={{
                             background: "linear-gradient(90deg, rgba(38, 28, 202, 1) 0%, rgba(88, 80, 220, 1) 70%, rgba(168, 124, 243, 1) 100%)",
@@ -182,7 +173,7 @@ function Acceuil() {
                     </button>
 
                     <button 
-                        onClick={() => setIsSalleOpen(true)} // ✅ Ouverture Popup 3D
+                        onClick={() => setIsSalleOpen(true)}
                         className="mt-10 bg-white border-2 border-indigo-600 px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg text-[#6057ED]"
                     >
                         Voir la Salle
@@ -258,8 +249,6 @@ function Acceuil() {
                     </div>
                 </div>
             </section>
-
-            {/* ❌ SECTION PRIX SUPPRIMÉE ICI ❌ */}
 
             <section id="testimonials" className="max-w-7xl mx-auto px-5 py-20 w-full">
                 <h1 className="text-6xl text-center mt-10 font-bold text-white mb-4">

@@ -2,9 +2,9 @@ import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function PayPalPart({ prix, titre, sessionId, onSuccess }) {
-
+//PAIEMENT FICTIF DONC ON UTILISE SANDBOX NIVEAU DEVPAYPAL
     const paypalOptions = {
-        "client-id": "test", // Gardez "test" pour la Sandbox
+        "client-id": "test", 
         currency: "EUR",
         intent: "capture"
     };
@@ -20,7 +20,6 @@ export default function PayPalPart({ prix, titre, sessionId, onSuccess }) {
         }
 
         const user = JSON.parse(userStr);
-        // On récupère l'ID (gère id, idUser ou id_user au cas où)
         const userId = user.id || user.idUser || user.id_user;
 
         if (!userId) {
@@ -30,7 +29,6 @@ export default function PayPalPart({ prix, titre, sessionId, onSuccess }) {
         }
         
         try {
-            // L'URL contient maintenant l'idApprenti correct
             const response = await fetch(`http://localhost:8080/api/paypal/capture-paiement?idSession=${sessionId}&idApprenti=${userId}`, {
                 method: "POST",
                 headers: {

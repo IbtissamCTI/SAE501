@@ -12,5 +12,5 @@ function EspaceEleveLayout() {
 		</div>
 	);
 }
-
+// Autre approche niveau interface -> non utilisé 
 export default EspaceEleveLayout;

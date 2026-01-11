@@ -13,5 +13,6 @@ function SiteLayout() {
 		</>
 	);
 }
+// Autre approche niveau interface -> non utilisé 
 
 export default SiteLayout;

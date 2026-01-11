@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { School, Bell, User, LogOut } from "lucide-react";
-
+//on a annulé ce composant (autre approche sur l'interface testée)
 function HeaderEleve() {
     const navigate = useNavigate();
 

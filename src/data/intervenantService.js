@@ -24,7 +24,7 @@ export const getIntervenantSessions = async () => {
         return await response.json();
     } catch (error) {
         console.error("Sessions:", error);
-        return []; // Retour vide si erreur
+        return []; 
     }
 };
 

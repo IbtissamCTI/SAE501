@@ -7,7 +7,6 @@ import {
   Grid, List, AlertCircle, Trash2, Briefcase, TrendingUp, Mail, LogOut
 } from "lucide-react";
 
-// --- CONFIGURATION API ---
 const API_URL = 'http://localhost:8080/api/intervenant';
 
 const getAuthHeaders = () => {
@@ -25,7 +24,6 @@ const IntervenantDashboard = () => {
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // ✅ ÉTATS CONNECTÉS AU BACKEND
   const [infosProf, setInfosProf] = useState({
     nom: "", prenom: "", email: "", pseudo: "", 
     telephone: "06 00 00 00 00", adresse: "Paris, France", 
@@ -36,7 +34,6 @@ const IntervenantDashboard = () => {
   const [planningProf, setPlanningProf] = useState([]);
   const [prochaineSession, setProchaineSession] = useState(null);
 
-  // Charger les données au montage
   useEffect(() => {
     const chargerDonnees = async () => {
       try {
@@ -64,7 +61,6 @@ const IntervenantDashboard = () => {
     chargerDonnees();
   }, [navigate]);
 
-  // Extraction Apprentis Uniques
   const mesApprentis = useMemo(() => {
     const map = new Map();
     sessionsDuProf.forEach(session => {
