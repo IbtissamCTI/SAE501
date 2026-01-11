@@ -97,4 +97,4 @@ Nous remercions l’équipe pédagogique pour leur encadrement sur ce module SAE
 
 1. **Cloner le dépôt :**
    ```bash
-   git clone [INSERER ICI L'URL DE VOTRE DEPOT GITHUB]
+   git clone https://github.com/IbtissamCTI/SAE501.git
