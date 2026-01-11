@@ -3,7 +3,7 @@ import {
     Atom, Server, Layers, BarChart, Cloud, Database, LayoutTemplate,
     CheckCircle, Lock, Calendar, MapPin, Clock, LogOut, User
 } from "lucide-react";
-import PayPalPart from "./PaypalPart";
+import PayPalPart from "./PaypalPart"; // Assurez-vous que ce fichier existe
 
 const CATEGORIES_STYLES = {
     "Front-End": { icon: LayoutTemplate, color: "text-blue-400", bg: "bg-blue-500/20", sub: "Interfaces & UX" },
@@ -34,50 +34,80 @@ export default function Formation() {
         setIsAuthenticated(false);
         setCurrentUser(null);
         alert("Vous êtes déconnecté.");
+        window.location.reload(); // Pour nettoyer proprement les états
     };
 
     useEffect(() => {
         const fetchData = async () => {
+            // 1. Gestion de l'Authentification locale
+            const authData = localStorage.getItem('authData');
+            const userData = localStorage.getItem('user');
+            
+            if (authData) {
+                setIsAuthenticated(true);
+                if (userData) {
+                    try {
+                        setCurrentUser(JSON.parse(userData));
+                    } catch (e) {
+                        console.error("Erreur parsing user", e);
+                    }
+                }
+            }
+
+            // 2. Préparation des headers
+            const headers = { "Content-Type": "application/json" };
+            if (authData) {
+                headers["Authorization"] = `Basic ${authData}`;
+            }
+
             try {
-                const authData = localStorage.getItem('authData');
-                const userData = localStorage.getItem('user');
+                // --- FETCH 1 : FORMATIONS (Souvent public) ---
+                const formationsRes = await fetch("http://localhost:8080/api/formations", { headers });
                 
-                if (authData) {
-                    setIsAuthenticated(true);
-                    if (userData) setCurrentUser(JSON.parse(userData));
+                if (formationsRes.ok) {
+                    const formationsData = await formationsRes.json();
+                    setBackendFormations(formationsData);
+
+                    // Calcul des catégories uniques
+                    const uniqueCats = [...new Set(formationsData.map(f => f.categorie))];
+                    setAvailableCategories(uniqueCats);
+                    
+                    // Sélectionner la première catégorie par défaut si aucune n'est active
+                    if (uniqueCats.length > 0 && !activeCategory) {
+                        setActiveCategory(uniqueCats[0]);
+                    }
+                } else {
+                    console.error("Erreur chargement formations:", formationsRes.status);
                 }
 
-                const headers = authData ? {
-                    "Content-Type": "application/json",
-                    "Authorization": `Basic ${authData}`
-                } : { "Content-Type": "application/json" };
-
-                const [formationsRes, sessionsRes] = await Promise.all([
-                    fetch("http://localhost:8080/api/formations", { headers }),
-                    fetch("http://localhost:8080/api/sessions", { headers })
-                ]);
-
-                if (!formationsRes.ok || !sessionsRes.ok) {
-                    return; 
+                // --- FETCH 2 : SESSIONS (Peut nécessiter Auth) ---
+                // On sépare le try/catch pour que les formations s'affichent même si les sessions plantent (401)
+                try {
+                    const sessionsRes = await fetch("http://localhost:8080/api/sessions", { headers });
+                    
+                    if (sessionsRes.ok) {
+                        const sessionsData = await sessionsRes.json();
+                        setBackendSessions(sessionsData);
+                    } else {
+                        // Si 401 Unauthorized ou 403 Forbidden, on met une liste vide sans planter
+                        console.warn(`Sessions non accessibles (Status: ${sessionsRes.status}). Connectez-vous pour voir les dates.`);
+                        setBackendSessions([]);
+                    }
+                } catch (sessionError) {
+                    console.warn("Erreur réseau ou technique lors du chargement des sessions:", sessionError);
+                    setBackendSessions([]);
                 }
-
-                const formationsData = await formationsRes.json();
-                const sessionsData = await sessionsRes.json();
-
-                setBackendFormations(formationsData);
-                setBackendSessions(sessionsData);
-
-                const uniqueCats = [...new Set(formationsData.map(f => f.categorie))];
-                setAvailableCategories(uniqueCats);
-                if (uniqueCats.length > 0 && !activeCategory) setActiveCategory(uniqueCats[0]);
 
             } catch (error) {
-                console.error(error);
+                console.error("Erreur globale lors du fetch :", error);
             }
         };
-        fetchData();
-    }, []);
 
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // On ne met pas activeCategory ici pour éviter une boucle infinie
+
+    // Scroll automatique vers les détails
     useEffect(() => {
         if (selectedTech && detailsRef.current) {
             setTimeout(() => {
@@ -87,21 +117,29 @@ export default function Formation() {
     }, [selectedTech]);
 
     const handleSuccess = () => {
+        alert("Paiement validé ! Inscription confirmée.");
         setSelectedSessionId(null);
         setSelectedTech(null);
     };
 
     const activeStyle = CATEGORIES_STYLES[activeCategory] || CATEGORIES_STYLES["Default"];
+    
+    // Filtrage des données
     const filteredFormations = backendFormations.filter(f => f.categorie === activeCategory);
-    const filteredSessions = backendSessions.filter(s => s.formation?.id === selectedTech?.id);
+    
+    // On filtre les sessions liées à la formation sélectionnée
+    const filteredSessions = backendSessions.filter(s => 
+        // Vérification robuste : s.formation peut être null ou undefined
+        s.formation && selectedTech && s.formation.id === selectedTech.id
+    );
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30 relative">
             <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
 
-            {/* J'ai changé top-6 en top-28 pour descendre le bloc sous ta navbar */}
+            {/* Barre utilisateur (Top Right) */}
             <div className="absolute top-28 right-10 flex gap-4 z-50">
-                {isAuthenticated ? (
+                {isAuthenticated && (
                     <div className="flex items-center gap-4 bg-[#0a0a0a] px-4 py-2 rounded-full border border-white/20 shadow-xl">
                         <div className="flex items-center gap-2 text-sm text-indigo-300">
                             <User size={16}/> 
@@ -111,7 +149,7 @@ export default function Formation() {
                             <LogOut size={12}/>
                         </button>
                     </div>
-                ) : null} 
+                )} 
             </div>
 
             <header className="text-center px-20 mb-20">
@@ -121,6 +159,7 @@ export default function Formation() {
                 </p>
             </header>
 
+            {/* SECTION 1 : CATÉGORIES */}
             <section className="mb-20">
                 <div className="text-center mb-8">
                     <span className="text-xl font-bold text-blue-400 uppercase tracking-widest">Étape 1</span>
@@ -128,7 +167,7 @@ export default function Formation() {
                 </div>
 
                 <div className="flex overflow-x-auto hide-scrollbar gap-5 px-[10vw] md:justify-center py-10 snap-x mandatory">
-                    {availableCategories.map((catName) => {
+                    {availableCategories.length > 0 ? availableCategories.map((catName) => {
                         const style = CATEGORIES_STYLES[catName] || CATEGORIES_STYLES["Default"];
                         const isActive = activeCategory === catName;
                         const Icon = style.icon;
@@ -144,10 +183,13 @@ export default function Formation() {
                                 <p className={`text-xs ${isActive ? "text-indigo-200" : "text-gray-400"}`}>{style.sub}</p>
                             </div>
                         );
-                    })}
+                    }) : (
+                        <p className="text-gray-500">Chargement des catégories...</p>
+                    )}
                 </div>
             </section>
 
+            {/* SECTION 2 : LISTE DES FORMATIONS */}
             <section ref={techGridRef} className="max-w-5xl mx-auto px-4 mb-20 min-h-[300px]">
                 <div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-500">
                     <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Étape 2</span>
@@ -169,9 +211,11 @@ export default function Formation() {
                 </div>
             </section>
 
+            {/* SECTION 3 : DÉTAILS ET SESSIONS */}
             {selectedTech && (
                 <section ref={detailsRef} className="max-w-6xl mx-auto px-4 py-12 border-t border-white/10 bg-[#0a0a0a] animate-in slide-in-from-bottom-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        {/* Gauche : Infos Formation */}
                         <div className="lg:col-span-2">
                             <h2 className="text-3xl font-bold mb-6 uppercase italic tracking-tighter">{selectedTech.titre} Intensif</h2>
                             <p className="text-gray-300 text-lg leading-relaxed mb-8">{selectedTech.description}</p>
@@ -183,13 +227,13 @@ export default function Formation() {
                             </div>
                         </div>
 
+                        {/* Droite : Sessions & Paiement */}
                         <div className="lg:col-span-1">
                             <div className="glass-card p-6 rounded-xl border border-white/5">
                                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2 italic uppercase tracking-tighter">
                                     <Calendar size={18} className="text-indigo-500" /> Prochaines Sessions
-                                    {/* Pour debug : Afficher si on est connecté */}
-                                    <span className={`text-[10px] ml-auto px-2 py-1 rounded ${isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                        {isAuthenticated ? 'Connecté' : 'Non connecté'}
+                                    <span className={`text-[10px] ml-auto px-2 py-1 rounded ${isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                        {isAuthenticated ? 'Connecté' : 'Visiteur'}
                                     </span>
                                 </h3>
 
@@ -203,7 +247,12 @@ export default function Formation() {
                                                 <div className="flex items-center gap-1"><Clock size={10}/> {s.horaires}</div>
                                             </div>
                                         </div>
-                                    )) : <p className="text-xs text-gray-500 italic">Aucune session ouverte pour cette formation.</p>}
+                                    )) : (
+                                        <div className="text-center py-4">
+                                            <p className="text-xs text-gray-500 italic mb-2">Aucune session disponible.</p>
+                                            {!isAuthenticated && <p className="text-[10px] text-red-400">Connectez-vous pour voir les disponibilités privées.</p>}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {selectedSessionId && (
@@ -213,7 +262,7 @@ export default function Formation() {
                                                 <Lock className="mx-auto mb-3 text-red-400" size={32} />
                                                 <h3 className="text-lg font-bold text-red-400 mb-2">CONNEXION REQUISE</h3>
                                                 <p className="text-sm text-gray-300 mb-4">
-                                                    Vous devez être connecté pour réserver.
+                                                    Vous devez être connecté pour réserver cette session.
                                                 </p>
                                                 <a href="/connexion" className="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors uppercase text-sm tracking-wider">
                                                     Se connecter
@@ -223,7 +272,7 @@ export default function Formation() {
                                             <>
                                                 <div className="mb-4 text-center">
                                                     <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Paiement Sécurisé</span>
-                                                    <p className="text-[10px] text-gray-500">Montant test : {selectedTech.prix}€</p>
+                                                    <p className="text-[10px] text-gray-500">Montant : {selectedTech.prix}€</p>
                                                 </div>
                                                 
                                                 <PayPalPart 

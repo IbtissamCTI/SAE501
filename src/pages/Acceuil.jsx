@@ -1,23 +1,36 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { 
-    Check, 
     Code, 
     UsersRound, 
     BriefcaseBusiness, 
     ChevronDown, 
     Send, 
-    Star 
+    Star,
+    X,
+    Loader2
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+// --- IMPORTS 3D ---
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useGLTF, Environment, Stage } from "@react-three/drei";
+
+function Model() {
+    // Si vous n'avez pas encore le fichier, commentez la ligne suivante et décommentez le cube plus bas pour tester
+    const { scene } = useGLTF("/sallefinale.glb"); 
+    return <primitive object={scene} />;
+    
+    // Fallback (cube) pour tester si vous n'avez pas encore converti le fichier .blend
+    // return <mesh><boxGeometry args={[2, 2, 2]} /><meshStandardMaterial color="#431EA7" /></mesh>;
+}
 
 function Acceuil() {
     const [questionOuverte, setQuestionOuverte] = useState(null);
+    const [isSalleOpen, setIsSalleOpen] = useState(false); // État pour la popup 3D
+    const navigate = useNavigate();
 
     const gererClickFAQ = (index) => {
-        if (questionOuverte === index) {
-            setQuestionOuverte(null);
-        } else {
-            setQuestionOuverte(index);
-        }
+        setQuestionOuverte(questionOuverte === index ? null : index);
     };
 
     const entreprisesBase = [
@@ -81,6 +94,47 @@ function Acceuil() {
 
     return (
         <>
+            {/* --- POPUP 3D (MODALE) --- */}
+            {isSalleOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="relative w-[90vw] h-[80vh] bg-[#0A0A0C] border border-[#2F008D] rounded-3xl shadow-[0_0_50px_rgba(67,30,167,0.3)] overflow-hidden flex flex-col">
+                        
+                        {/* Header de la modale */}
+                        <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10 bg-gradient-to-b from-black/80 to-transparent">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">Nos Locaux</h3>
+                                <p className="text-sm text-gray-400">Explorez votre futur environnement de travail (Cliquez et glissez pour tourner)</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsSalleOpen(false)}
+                                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Canvas 3D */}
+                        <div className="w-full h-full cursor-move">
+                            <Canvas shadows dpr={[1, 2]} camera={{ fov: 50, position: [0, 2, 10] }}>
+                                <Suspense fallback={null}>
+                                    <Stage environment="city" intensity={0.6}>
+                                        <Model />
+                                    </Stage>
+                                </Suspense>
+                                <OrbitControls autoRotate autoRotateSpeed={0.5} />
+                            </Canvas>
+                            
+                            {/* Overlay de chargement si nécessaire */}
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none">
+                                <span className="text-xs font-bold text-[#8D83E0] uppercase tracking-widest bg-black/50 px-4 py-2 rounded-full border border-[#2F008D]">
+                                    Modèle 3D Interactif
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <section
                 id="home"
                 className="p-40 w-auto h-auto flex flex-col justify-center items-center text-center px-4 relative overflow-hidden"
@@ -117,6 +171,7 @@ function Acceuil() {
 
                 <div className="flex gap-8 justify-center">
                     <button
+                        onClick={() => navigate('/formations')} // ✅ Redirection activée
                         className="mt-10 text-white px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg"
                         style={{
                             background: "linear-gradient(90deg, rgba(38, 28, 202, 1) 0%, rgba(88, 80, 220, 1) 70%, rgba(168, 124, 243, 1) 100%)",
@@ -126,7 +181,10 @@ function Acceuil() {
                         Explore les formations
                     </button>
 
-                    <button className="mt-10 bg-white border-2 border-indigo-600 px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg text-[#6057ED]">
+                    <button 
+                        onClick={() => setIsSalleOpen(true)} // ✅ Ouverture Popup 3D
+                        className="mt-10 bg-white border-2 border-indigo-600 px-8 py-4 rounded-2xl transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] font-semibold text-lg text-[#6057ED]"
+                    >
                         Voir la Salle
                     </button>
                 </div>
@@ -201,60 +259,7 @@ function Acceuil() {
                 </div>
             </section>
 
-            <section id="about" className="px-5 py-20 w-full flex flex-col items-center">
-                <h1 className="text-white text-6xl my-10 font-bold text-center">
-                    Investissez dans votre Avenir
-                </h1>
-                <p className="text-gray-400 mb-10 text-xl text-center max-w-3xl">
-                    Des formules transparentes, sans coûts cachés.<br />Eligible CPF et OPCO
-                </p>
-
-                <div className="mt-20 w-full max-w-7xl">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                        
-                        <div className="border border-white/10 bg-zinc-900/30 p-8 rounded-3xl flex flex-col h-full text-white">
-                            <h3 className="text-xl font-bold">Autonomie</h3>
-                            <div className="text-4xl font-extrabold mt-4 mb-2">490 €</div>
-                            <p className="text-sm text-gray-400 mb-6">Paiement en plusieurs fois</p>
-                            <ul className="space-y-4 mb-8 flex-1">
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Accès illimité aux cours</li>
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Communauté Discord</li>
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Soutien Codeurs</li>
-                            </ul>
-                            <button className="w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 transition font-semibold">Choisir</button>
-                        </div>
-
-                        <div className="relative bg-white text-black p-8 rounded-3xl flex flex-col shadow-2xl shadow-purple-900/20 transform md:scale-110 z-10">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-white text-xs font-semibold px-5 py-3 rounded-xl uppercase tracking-wide" 
-                                 style={{ background: "linear-gradient(90deg, rgba(38, 28, 202, 1) 0%, rgba(88, 80, 220, 1) 70%, rgba(168, 124, 243, 1) 100%)" }}>
-                                Le + populaire
-                            </div>
-                            <h3 className="text-xl font-bold mt-2">Bootcamp intensif</h3>
-                            <div className="text-4xl font-extrabold mt-4 mb-2">1490 €</div>
-                            <p className="text-sm text-gray-600 mb-6">Payable en 3x ou 4x sans frais</p>
-                            <ul className="space-y-4 mb-8 flex-1">
-                                <li className="flex items-center gap-3 text-sm font-medium"><Check color="#4F46E5" /> Tuteur dédié (mentor)</li>
-                                <li className="flex items-center gap-3 text-sm font-medium"><Check color="#4F46E5" /> Projets réels & Code Review</li>
-                                <li className="flex items-center gap-3 text-sm font-medium"><Check color="#4F46E5" /> Career Coaching</li>
-                                <li className="flex items-center gap-3 text-sm font-medium"><Check color="#4F46E5" /> Garantie Emploi</li>
-                            </ul>
-                            <button className="w-full py-3 rounded-xl bg-black text-white hover:bg-gray-800 transition font-bold">Je démarre</button>
-                        </div>
-
-                        <div className="border border-white/10 bg-zinc-900/30 p-8 rounded-3xl flex flex-col h-full text-white">
-                            <h3 className="text-xl font-bold">Alternance</h3>
-                            <div className="text-4xl font-extrabold mt-4 mb-2">0 €</div>
-                            <p className="text-sm text-gray-400 mb-6">100% financé par l'entreprise</p>
-                            <ul className="space-y-4 mb-8 flex-1">
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Formation en 12 mois</li>
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Salaire mensuel</li>
-                                <li className="flex items-center gap-3 text-sm text-gray-300"><Check color="#4F46E5" /> Diplôme reconnu</li>
-                            </ul>
-                            <button className="w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 transition font-semibold">Candidater</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* ❌ SECTION PRIX SUPPRIMÉE ICI ❌ */}
 
             <section id="testimonials" className="max-w-7xl mx-auto px-5 py-20 w-full">
                 <h1 className="text-6xl text-center mt-10 font-bold text-white mb-4">
@@ -281,11 +286,9 @@ function Acceuil() {
                             </div>
                             
                             <div className="flex gap-1 mb-4">
-                                <Star size={16} className="fill-yellow-500 text-yellow-500" />
-                                <Star size={16} className="fill-yellow-500 text-yellow-500" />
-                                <Star size={16} className="fill-yellow-500 text-yellow-500" />
-                                <Star size={16} className="fill-yellow-500 text-yellow-500" />
-                                <Star size={16} className="fill-yellow-500 text-yellow-500" />
+                                {[...Array(5)].map((_, j) => (
+                                    <Star key={j} size={16} className="fill-yellow-500 text-yellow-500" />
+                                ))}
                             </div>
 
                             <p className="text-gray-400 leading-relaxed italic">"{avis.message}"</p>
@@ -353,6 +356,5 @@ function Acceuil() {
         </>
     );
 }
-//ejsdfmkleùqlskrgjsdqsdcq,ml
 
 export default Acceuil;

@@ -5,6 +5,7 @@ import {
     Search, MoreVertical, PenTool, Award, LogOut, BookOpen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf";
 
 // --- STYLES ---
 const styles = {
@@ -24,6 +25,76 @@ const getSessionStatus = (dateSession) => {
     if (isToday) return { label: "En cours", style: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" };
     if (sessionDate < now) return { label: "Terminé", style: "bg-green-500/10 text-green-500 border-green-500/20" };
     return { label: "À venir", style: "bg-blue-500/10 text-blue-500 border-blue-500/20" };
+};
+
+// --- GÉNÉRATION PDF ---
+const generateCertificate = (studentName, courseTitle) => {
+    const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+    });
+
+    const primaryColor = "#431EA7"; 
+    const secondaryColor = "#333333";
+
+    doc.setLineWidth(3);
+    doc.setDrawColor(primaryColor);
+    doc.rect(10, 10, 277, 190); 
+    
+    doc.setLineWidth(1);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(15, 15, 267, 180); 
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(24);
+    doc.setTextColor(primaryColor);
+    doc.text("NOVATIO", 20, 30);
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(40);
+    doc.setTextColor(secondaryColor);
+    doc.text("CERTIFICAT DE RÉUSSITE", 148.5, 60, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(16);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Ce certificat atteste que", 148.5, 85, { align: "center" });
+
+    // Nom de l'étudiant (En majuscules)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(30);
+    doc.setTextColor(primaryColor);
+    const nameDisplay = studentName ? studentName.toUpperCase() : "ÉTUDIANT";
+    doc.text(nameDisplay, 148.5, 105, { align: "center" });
+    
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(primaryColor);
+    doc.line(80, 110, 217, 110);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(16);
+    doc.setTextColor(100, 100, 100);
+    doc.text("a validé avec succès la formation", 148.5, 125, { align: "center" });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(secondaryColor);
+    doc.text(courseTitle || "Formation Complète", 148.5, 140, { align: "center" });
+
+    const today = new Date().toLocaleDateString("fr-FR");
+    
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Fait le ${today}`, 50, 170);
+    doc.text("Directeur Pédagogique", 220, 170);
+
+    doc.setFont("times", "italic");
+    doc.setFontSize(20);
+    doc.setTextColor(primaryColor);
+    doc.text("L'équipe Novatio", 220, 185);
+
+    doc.save(`Certificat_${nameDisplay.replace(/\s+/g, '_')}.pdf`);
 };
 
 const Notification = ({ message, onClose }) => {
@@ -65,7 +136,6 @@ const CustomBarChart = ({ data }) => {
     );
 };
 
-// --- COMPOSANTS VUES ---
 const VueDashboard = ({ nextSession, handleEmargement, hasSigned, triggerNotification, navigateTab, upcomingSessions, history, lastResult, chartData, studentInfo }) => {
     const now = new Date();
     const displayUpcoming = upcomingSessions.filter(s => new Date(s.fullDate) >= now).slice(0, 3);
@@ -120,7 +190,23 @@ const VueDashboard = ({ nextSession, handleEmargement, hasSigned, triggerNotific
                 </div>
             </div>
             <div className="space-y-8">
-                <div className={`${styles.card} relative overflow-hidden`}><div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#34D399] to-[#5B4DFF]"></div><h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Trophy size={20} className="text-[#34D399]" /> Derniers résultats</h3><div className="flex flex-col items-center mb-6"><div className="w-32 h-32 rounded-full border-4 border-[#1F1F23] relative flex items-center justify-center bg-[#050507] shadow-[0_0_30px_rgba(52,211,153,0.1)]"><div className="text-center"><span className="text-4xl font-bold text-white">{lastResult.score}</span><span className="text-sm text-gray-500 block font-bold">/ {lastResult.total}</span></div></div></div><div className="text-center mb-6"><p className="text-sm text-gray-300 font-medium mb-1">{lastResult.module}</p><p className="text-xs text-[#34D399] bg-[#34D399]/10 py-1 px-2 rounded inline-block border border-[#34D399]/20">{lastResult.feedback}</p></div><button onClick={() => triggerNotification("Téléchargement...")} className={styles.buttonAction}><Download size={18} /> Attestation</button></div>
+                <div className={`${styles.card} relative overflow-hidden`}>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#34D399] to-[#5B4DFF]"></div>
+                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Trophy size={20} className="text-[#34D399]" /> Derniers résultats</h3>
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="w-32 h-32 rounded-full border-4 border-[#1F1F23] relative flex items-center justify-center bg-[#050507] shadow-[0_0_30px_rgba(52,211,153,0.1)]">
+                            <div className="text-center"><span className="text-4xl font-bold text-white">{lastResult.score}</span><span className="text-sm text-gray-500 block font-bold">/ {lastResult.total}</span></div>
+                        </div>
+                    </div>
+                    <div className="text-center mb-6"><p className="text-sm text-gray-300 font-medium mb-1">{lastResult.module}</p><p className="text-xs text-[#34D399] bg-[#34D399]/10 py-1 px-2 rounded inline-block border border-[#34D399]/20">{lastResult.feedback}</p></div>
+                    {/* BOUTON ATTESTATION AVEC LE NOM CORRIGÉ */}
+                    <button 
+                        onClick={() => generateCertificate(studentInfo.name, lastResult.module)} 
+                        className={styles.buttonAction}
+                    >
+                        <Download size={18} /> Attestation
+                    </button>
+                </div>
                 <div className={styles.card}><h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><TrendingUp size={20} className="text-[#5B4DFF]" /> Activité Hebdo</h3><CustomBarChart data={chartData} /></div>
             </div>
         </div>
@@ -128,8 +214,43 @@ const VueDashboard = ({ nextSession, handleEmargement, hasSigned, triggerNotific
 };
 
 const VuePlanning = ({ showCalendar, setShowCalendar, upcomingSessions }) => (<div className="animate-in fade-in"><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-white">Mon Planning (Tout)</h2><button onClick={() => setShowCalendar(!showCalendar)} className="flex items-center gap-2 bg-[#1F1F23] px-4 py-2 rounded-xl text-sm font-bold text-[#A78BFA] hover:text-white transition border border-[#1F1F23] hover:border-[#5B4DFF]">{showCalendar ? <><List size={16} /> Vue Liste</> : <><Grid size={16} /> Vue Calendrier</>}</button></div>{showCalendar ? (<div className={styles.card}><div className="grid grid-cols-7 gap-4 mb-4 text-center text-gray-500 font-bold uppercase text-xs"><div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div></div><div className="grid grid-cols-7 gap-4">{Array.from({ length: 31 }, (_, i) => { const day = i + 1; const session = upcomingSessions.find(s => s.day === day); return (<div key={day} className={`min-h-[100px] p-3 rounded-2xl border ${session ? "bg-[#2D1B4E]/50 border-[#5B4DFF]/50 shadow-[inset_0_0_20px_rgba(91,77,255,0.1)]" : "bg-[#1F1F23]/50 border-transparent"} relative group transition-all hover:bg-[#1F1F23]`}> <span className={`text-sm font-bold ${session ? "text-white" : "text-gray-600"}`}>{day}</span>{session && (<div className="mt-2"><div className="text-[10px] font-bold text-[#A78BFA] bg-[#2D1B4E] px-1.5 py-0.5 rounded w-fit mb-1">{session.time}</div><div className="text-xs font-bold text-white leading-tight truncate">{session.title}</div></div>)}</div>); })}</div></div>) : (<div className="grid gap-4">{upcomingSessions.map((session) => (<div key={session.id} className={`${styles.card} flex justify-between items-center hover:border-[#5B4DFF]/50`}><div className="flex items-center gap-4"><div className="bg-[#1F1F23] p-3 rounded-xl text-[#5B4DFF]"><Calendar size={24} /></div><div><h4 className="font-bold text-white text-lg">{session.title}</h4><p className="text-gray-400 text-sm flex items-center gap-2"><Clock size={14} /> {session.date} • {session.time}</p></div></div><div className="text-right"><span className={`text-sm font-bold px-3 py-1 rounded-lg border ${session.statusInfo.style}`}>{session.statusInfo.label}</span></div></div>))}</div>)}</div>);
-const VueHistory = ({ history }) => (<div className="animate-in fade-in"><h2 className="text-2xl font-bold text-white mb-6">Historique complet</h2><div className={`${styles.card} p-0 overflow-hidden`}><table className="w-full text-left"><thead className="bg-[#18181b] text-gray-400 text-xs uppercase font-bold"><tr><th className="p-4">Session</th><th className="p-4 text-center">Statut</th><th className="p-4 text-center">Note</th><th className="p-4 text-center">Certificat</th><th className="p-4">Formateur</th><th className="p-4 text-right">Date</th></tr></thead><tbody className="divide-y divide-[#1F1F23]">{history.map((item) => (<tr key={item.id} className="hover:bg-[#1F1F23]/50 transition"><td className="p-4 font-bold text-white">{item.title}</td><td className="p-4 text-center"><span className={`px-2 py-1 rounded text-xs font-bold border ${item.statusInfo.style}`}>{item.statusInfo.label}</span></td><td className="p-4 text-center"><span className={`px-2 py-1 rounded text-xs font-bold border ${ (item.note || 0) >= 10 ? "bg-[#34D399]/10 text-[#34D399] border-[#34D399]/20" : "bg-red-500/10 text-red-500 border-red-500/20" }`}>{item.note !== undefined ? item.note + "/20" : "-"}</span></td><td className="p-4 text-center">{(item.note || 0) >= 10 ? (<button className="text-[#5B4DFF] hover:text-white transition flex items-center justify-center gap-1 mx-auto text-xs font-bold bg-[#5B4DFF]/10 hover:bg-[#5B4DFF] px-3 py-1 rounded-lg" onClick={() => alert(`Téléchargement du certificat...`)}><Award size={14} /> PDF</button>) : <span className="text-gray-600 text-xs italic">-</span>}</td><td className="p-4 text-gray-400">{item.trainer}</td><td className="p-4 text-right text-gray-500">{item.date}</td></tr>))}</tbody></table></div></div>);
-const VueMessages = ({ contacts, selectedContact, setSelectedContact, messageInput, setMessageInput, handleSendMessage, triggerNotification }) => (<div className="animate-in fade-in h-[600px] flex gap-6"><div className={`${styles.card} w-1/3 flex flex-col p-0 overflow-hidden`}><div className="p-6 border-b border-[#1F1F23]"><h3 className="text-xl font-bold text-white mb-4">Messages</h3><div className="relative"><Search size={16} className="absolute left-3 top-3 text-gray-500" /><input type="text" placeholder="Rechercher..." className={styles.inputField + " pl-10"} /></div></div><div className="flex-1 overflow-y-auto">{contacts.map((contact) => (<div key={contact.id} onClick={() => setSelectedContact(contact.id)} className={`p-4 flex items-center gap-4 cursor-pointer transition hover:bg-[#1F1F23] ${selectedContact === contact.id ? "bg-[#1F1F23] border-l-2 border-[#5B4DFF]" : ""}`}><div className="relative"><div className="w-10 h-10 rounded-full bg-[#2D1B4E] flex items-center justify-center text-[#A78BFA] font-bold">{contact.name.charAt(0)}</div>{contact.online && <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#34D399] rounded-full border-2 border-[#0A0A0C]"></div>}</div><div><h4 className="font-bold text-white text-sm">{contact.name}</h4><p className="text-xs text-gray-500">{contact.role}</p></div></div>))}</div></div><div className={`${styles.card} flex-1 flex flex-col p-0 overflow-hidden`}><div className="p-4 border-b border-[#1F1F23] flex justify-between items-center bg-[#0F0F11]"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-[#2D1B4E] flex items-center justify-center text-[#A78BFA] font-bold">{activeConv.name.charAt(0)}</div><div><h4 className="font-bold text-white text-sm">{activeConv.name}</h4><p className="text-xs text-green-500">{activeConv.online ? "En ligne" : "Absent"}</p></div></div><button className="text-gray-500 hover:text-white"><MoreVertical size={20} /></button></div><div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#0A0A0C]"><div className="text-center text-xs text-gray-600 my-4">Aujourd'hui</div>{activeConv.messages.length > 0 ? activeConv.messages.map((msg) => (<div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}><div className={`max-w-[70%] p-4 rounded-2xl text-sm ${msg.sender === "me" ? "bg-[#5B4DFF] text-white rounded-br-none" : "bg-[#1F1F23] text-gray-300 rounded-bl-none"}`}><p>{msg.text}</p><span className="text-[10px] opacity-50 block text-right mt-1">{msg.time}</span></div></div>)) : <div className="h-full flex flex-col items-center justify-center text-gray-600 opacity-50"><MessageSquare size={48} className="mb-2" /><p>Démarrez la conversation</p></div>}</div><form onSubmit={handleSendMessage} className="p-4 border-t border-[#1F1F23] bg-[#0F0F11] flex items-center gap-3"><button type="button" onClick={() => triggerNotification("Fichier joint")} className="p-2 text-gray-500 hover:text-[#5B4DFF]"><Paperclip size={20} /></button><input type="text" value={messageInput} onChange={(e) => setMessageInput(e.target.value)} placeholder="Écrivez votre message..." className={styles.inputField} /><button type="submit" className="p-3 bg-[#5B4DFF] text-white rounded-xl hover:bg-[#4c3df0] shadow-lg"><Send size={18} /></button></form></div></div>);
+
+// VUE HISTORY MODIFIÉE POUR PRENDRE LE NOM
+const VueHistory = ({ history, studentName }) => (
+    <div className="animate-in fade-in">
+        <h2 className="text-2xl font-bold text-white mb-6">Historique complet</h2>
+        <div className={`${styles.card} p-0 overflow-hidden`}>
+            <table className="w-full text-left">
+                <thead className="bg-[#18181b] text-gray-400 text-xs uppercase font-bold">
+                    <tr><th className="p-4">Session</th><th className="p-4 text-center">Statut</th><th className="p-4 text-center">Note</th><th className="p-4 text-center">Certificat</th><th className="p-4">Formateur</th><th className="p-4 text-right">Date</th></tr>
+                </thead>
+                <tbody className="divide-y divide-[#1F1F23]">
+                    {history.map((item) => (
+                        <tr key={item.id} className="hover:bg-[#1F1F23]/50 transition">
+                            <td className="p-4 font-bold text-white">{item.title}</td>
+                            <td className="p-4 text-center"><span className={`px-2 py-1 rounded text-xs font-bold border ${item.statusInfo.style}`}>{item.statusInfo.label}</span></td>
+                            <td className="p-4 text-center"><span className={`px-2 py-1 rounded text-xs font-bold border ${ (item.note || 0) >= 10 ? "bg-[#34D399]/10 text-[#34D399] border-[#34D399]/20" : "bg-red-500/10 text-red-500 border-red-500/20" }`}>{item.note !== undefined ? item.note + "/20" : "-"}</span></td>
+                            <td className="p-4 text-center">
+                                {(item.note || 0) >= 10 ? (
+                                    <button 
+                                        className="text-[#5B4DFF] hover:text-white transition flex items-center justify-center gap-1 mx-auto text-xs font-bold bg-[#5B4DFF]/10 hover:bg-[#5B4DFF] px-3 py-1 rounded-lg" 
+                                        onClick={() => generateCertificate(studentName, item.title)}
+                                    >
+                                        <Award size={14} /> PDF
+                                    </button>
+                                ) : <span className="text-gray-600 text-xs italic">-</span>}
+                            </td>
+                            <td className="p-4 text-gray-400">{item.trainer}</td>
+                            <td className="p-4 text-right text-gray-500">{item.date}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </div>
+);
+
+const VueMessages = ({ contacts, selectedContact, setSelectedContact, messageInput, setMessageInput, handleSendMessage, triggerNotification }) => (<div className="animate-in fade-in h-[600px] flex gap-6"><div className={`${styles.card} w-1/3 flex flex-col p-0 overflow-hidden`}><div className="p-6 border-b border-[#1F1F23]"><h3 className="text-xl font-bold text-white mb-4">Messages</h3><div className="relative"><Search size={16} className="absolute left-3 top-3 text-gray-500" /><input type="text" placeholder="Rechercher..." className={styles.inputField + " pl-10"} /></div></div><div className="flex-1 overflow-y-auto">{contacts.map((contact) => (<div key={contact.id} onClick={() => setSelectedContact(contact.id)} className={`p-4 flex items-center gap-4 cursor-pointer transition hover:bg-[#1F1F23] ${selectedContact === contact.id ? "bg-[#1F1F23] border-l-2 border-[#5B4DFF]" : ""}`}><div className="relative"><div className="w-10 h-10 rounded-full bg-[#2D1B4E] flex items-center justify-center text-[#A78BFA] font-bold">{contact.name.charAt(0)}</div>{contact.online && <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#34D399] rounded-full border-2 border-[#0A0A0C]"></div>}</div><div><h4 className="font-bold text-white text-sm">{contact.name}</h4><p className="text-xs text-gray-500">{contact.role}</p></div></div>))}</div></div><div className={`${styles.card} flex-1 flex flex-col p-0 overflow-hidden`}><div className="p-4 border-b border-[#1F1F23] flex justify-between items-center bg-[#0F0F11]"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-[#2D1B4E] flex items-center justify-center text-[#A78BFA] font-bold">{contacts.find(c => c.id === selectedContact)?.name.charAt(0)}</div><div><h4 className="font-bold text-white text-sm">{contacts.find(c => c.id === selectedContact)?.name}</h4><p className="text-xs text-green-500">En ligne</p></div></div><button className="text-gray-500 hover:text-white"><MoreVertical size={20} /></button></div><div className="flex-1 p-6 overflow-y-auto space-y-4 bg-[#0A0A0C]"><div className="text-center text-xs text-gray-600 my-4">Aujourd'hui</div><div className="h-full flex flex-col items-center justify-center text-gray-600 opacity-50"><MessageSquare size={48} className="mb-2" /><p>Démarrez la conversation</p></div></div><form onSubmit={handleSendMessage} className="p-4 border-t border-[#1F1F23] bg-[#0F0F11] flex items-center gap-3"><button type="button" onClick={() => triggerNotification("Fichier joint")} className="p-2 text-gray-500 hover:text-[#5B4DFF]"><Paperclip size={20} /></button><input type="text" value={messageInput} onChange={(e) => setMessageInput(e.target.value)} placeholder="Écrivez votre message..." className={styles.inputField} /><button type="submit" className="p-3 bg-[#5B4DFF] text-white rounded-xl hover:bg-[#4c3df0] shadow-lg"><Send size={18} /></button></form></div></div>);
 
 const StudentDashboard = () => {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -140,12 +261,12 @@ const StudentDashboard = () => {
     const [messageInput, setMessageInput] = useState("");
     const navigate = useNavigate();
 
-    const [studentInfo, setStudentInfo] = useState({ name: "Apprenti", level: "Niveau 4 - Expert", avatar: "A" });
+    // Initialisation
+    const [studentInfo, setStudentInfo] = useState({ name: "Chargement...", level: "Niveau 4 - Expert", avatar: "?" });
     const [nextSession, setNextSession] = useState(null);
     const [upcomingSessions, setUpcomingSessions] = useState([]);
     const [history, setHistory] = useState([]);
 
-    // ✅ CETTE LIGNE ETAIT MANQUANTE ET CAUSAIT LE CRASH
     const triggerNotification = (msg) => setNotification(msg);
 
     const handleLogout = () => {
@@ -154,7 +275,7 @@ const StudentDashboard = () => {
     };
 
     const goToCatalogue = () => {
-        navigate('/formations'); // Correction pluriel
+        navigate('/formations');
     };
 
     useEffect(() => {
@@ -165,12 +286,25 @@ const StudentDashboard = () => {
             let user = {};
             try { user = JSON.parse(userStr); } catch (e) { console.error(e); }
             
+            // --- DEBUG : REGARDEZ LA CONSOLE POUR VOIR LE CONTENU DU USER ---
+            console.log("USER CHARGÉ DU STORAGE :", user);
+
+            // --- CORRECTION DU NOM ---
+            // On vérifie si prenom et nom existent, sinon on prend le pseudo, sinon "Apprenti"
+            let fullName = "Apprenti";
+            if (user.prenom && user.nom) {
+                fullName = `${user.prenom} ${user.nom}`;
+            } else if (user.pseudo) {
+                fullName = user.pseudo;
+            }
+
             setStudentInfo({
-                name: `${user.prenom || "Apprenti"} ${user.nom || ""}`.trim(),
+                name: fullName,
                 level: "Niveau 4 - Expert",
-                avatar: (user.prenom || "A").charAt(0).toUpperCase()
+                avatar: (user.prenom || user.pseudo || "A").charAt(0).toUpperCase()
             });
 
+            // Chargement des sessions
             const authData = localStorage.getItem("authData");
             const userId = user.id || user.idUser || user.id_user;
             if (!userId) return;
@@ -222,7 +356,7 @@ const StudentDashboard = () => {
 
     const lastResult = { module: "Architecture Node.js", score: 16, total: 20, feedback: "Bravo ! Session validée." };
     const chartData = [ { label: "Lun", value: 4 }, { label: "Mar", value: 7 }, { label: "Mer", value: 3 }, { label: "Jeu", value: 8 }, { label: "Ven", value: 5 }, { label: "Sam", value: 9 }, { label: "Dim", value: 2 } ];
-    const contacts = [ { id: 1, name: "Administration", role: "Scolarité", online: true, messages: [ { id: 1, text: "Bonjour, votre dossier est complet.", sender: "other", time: "10:00" }, { id: 2, text: "Merci !", sender: "me", time: "10:05" } ] }, { id: 2, name: "Don Dada", role: "Formateur React", online: false, messages: [] } ];
+    const contacts = [ { id: 1, name: "Administration", role: "Scolarité", online: true, messages: [] }, { id: 2, name: "Don Dada", role: "Formateur React", online: false, messages: [] } ];
 
     const handleEmargement = () => { setHasSigned(true); triggerNotification("Votre présence a bien été enregistrée."); };
     const handleSendMessage = (e) => { e.preventDefault(); if (messageInput.trim() === "") return; triggerNotification("Message envoyé !"); setMessageInput(""); };
@@ -246,7 +380,10 @@ const StudentDashboard = () => {
             <div className="min-h-[400px]">
                 {activeTab === "dashboard" && <VueDashboard nextSession={nextSession} handleEmargement={handleEmargement} hasSigned={hasSigned} triggerNotification={triggerNotification} navigateTab={setActiveTab} upcomingSessions={upcomingSessions} history={history} lastResult={lastResult} chartData={chartData} studentInfo={studentInfo} />}
                 {activeTab === "planning" && <VuePlanning showCalendar={showCalendar} setShowCalendar={setShowCalendar} upcomingSessions={upcomingSessions} />}
-                {activeTab === "history" && <VueHistory history={history} />}
+                
+                {/* On passe bien le nom calculé au composant History */}
+                {activeTab === "history" && <VueHistory history={history} studentName={studentInfo.name} />}
+                
                 {activeTab === "messages" && <VueMessages contacts={contacts} selectedContact={selectedContact} setSelectedContact={setSelectedContact} messageInput={messageInput} setMessageInput={setMessageInput} handleSendMessage={handleSendMessage} triggerNotification={triggerNotification} />}
             </div>
             {notification && <Notification message={notification} onClose={() => setNotification(null)} />}

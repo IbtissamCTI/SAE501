@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Star, User, Shield, Briefcase, ArrowRight, ArrowLeft, Mail, Lock, Check } from "lucide-react";
+import { Star, User, Shield, Briefcase, ArrowRight, ArrowLeft, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../data/authService.js"; // Assure-toi que ce chemin est bon
 
-// --- COMPOSANT LAYOUT (PARTIE GAUCHE FIXE) ---
+// --- COMPOSANT LAYOUT (PARTIE GAUCHE FIXE - TON DESIGN) ---
 const AuthLayout = ({ children }) => {
     return (
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
@@ -53,8 +52,10 @@ const AuthLayout = ({ children }) => {
 const Connexion = () => {
     // État pour savoir si on est sur la vue "SELECTION" ou "LOGIN"
     const [view, setView] = useState("selection"); // 'selection' ou 'login'
-    const [roleTarget, setRoleTarget] = useState("/student"); // Où aller après connexion
-    const [roleName, setRoleName] = useState("Élève"); // Pour afficher le titre
+    
+    // On garde ces états pour l'affichage du titre (ex: "Accès : Espace Élève")
+    const [roleTarget, setRoleTarget] = useState("/dashboard"); 
+    const [roleName, setRoleName] = useState("Élève");
 
     const navigate = useNavigate();
 
@@ -63,24 +64,66 @@ const Connexion = () => {
     const [motDePasse, setMotDePasse] = useState("");
     const [error, setError] = useState(null);
 
-    // Fonction quand on clique sur une carte
+    // Fonction quand on clique sur une carte (Choix du rôle)
     const handleChoice = (path, name) => {
-        setRoleTarget(path);
+        // Astuce : même si on clique sur étudiant, on force le chemin vers dashboard en interne pour plus tard
+        const realPath = path === "/student" || path === "/eleve" ? "/dashboard" : path;
+        
+        setRoleTarget(realPath);
         setRoleName(name);
-        setView("login"); // On change juste la vue de droite
+        setView("login"); 
         setError(null);
     };
 
-    // Fonction de connexion
+    // --- LA LOGIQUE RÉPARÉE EST ICI ---
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
+        console.log("Tentative de connexion...");
+
         try {
-            await login(pseudo, motDePasse);
-            navigate(roleTarget); // Redirection finale vers le dashboard
+            // 1. Appel au Backend Java
+            const response = await fetch("http://localhost:8080/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pseudo, motDePasse }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // 2. Normalisation du rôle
+                let userRole = data.role ? data.role.toUpperCase() : "APPRENTI";
+                // Sécurité : Si ce n'est pas un admin ou un prof, on considère que c'est un élève
+                if (userRole !== "ADMIN" && userRole !== "INTERVENANT") {
+                    userRole = "APPRENTI";
+                }
+
+                // 3. Sauvegarde dans le navigateur
+                const userToSave = { ...data, role: userRole };
+                localStorage.setItem("user", JSON.stringify(userToSave));
+                localStorage.setItem("authData", window.btoa(pseudo + ":" + motDePasse));
+
+                console.log("Connecté en tant que :", userRole);
+
+                // 4. REDIRECTION CORRECTE (On ignore le choix visuel, on fait confiance au backend)
+                if (userRole === "ADMIN") {
+                    navigate("/admin");
+                } else if (userRole === "INTERVENANT") {
+                    navigate("/intervenant");
+                } else {
+                    // C'est ici la correction importante :
+                    console.log("Redirection vers le dashboard Apprenti");
+                    navigate("/dashboard");
+                }
+
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText || "Identifiants incorrects");
+            }
         } catch (err) {
             console.error(err);
-            setError("Identifiants incorrects (Essayez admin/admin)");
+            setError("Pseudo ou mot de passe incorrect.");
         }
     };
 
@@ -95,7 +138,8 @@ const Connexion = () => {
                         <p className="text-gray-400 mb-8 text-sm">Choisissez votre espace pour continuer.</p>
 
                         <div className="space-y-4">
-                            <button onClick={() => handleChoice("/student", "Espace Élève")} className="w-full flex items-center justify-between p-4 rounded-xl bg-[#1F1F23] border border-white/10 hover:border-indigo-500 hover:bg-[#27272A] transition group text-left">
+                            {/* Bouton Élève corrigé (visuellement identique, mais prépare le bon chemin) */}
+                            <button onClick={() => handleChoice("/dashboard", "Espace Élève")} className="w-full flex items-center justify-between p-4 rounded-xl bg-[#1F1F23] border border-white/10 hover:border-indigo-500 hover:bg-[#27272A] transition group text-left">
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition"><User size={20} /></div>
                                     <div><span className="block font-bold text-white text-sm">Espace Élève</span><span className="text-xs text-gray-500">Accéder à mes cours</span></div>
@@ -127,7 +171,7 @@ const Connexion = () => {
                     </div>
                 )}
 
-                {/* --- VUE 2 : FORMULAIRE DSSSSSSSSSSDE CONNEtehgdfXION --- */}
+                {/* --- VUE 2 : FORMULAIRE DE CONNEXION --- */}
                 {view === "login" && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                         <button onClick={() => setView("selection")} className="flex items-center gap-2 text-gray-500 hover:text-white mb-6 text-sm transition">
@@ -142,7 +186,7 @@ const Connexion = () => {
                                 <label className="text-xs font-medium text-gray-400 ml-1">Pseudo</label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-3.5 text-zinc-500" size={16} />
-                                    <input type="text" value={pseudo} onChange={(e) => setPseudo(e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition-all text-sm" placeholder="nom.prenom" required />
+                                    <input type="text" value={pseudo} onChange={(e) => setPseudo(e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition-all text-sm" placeholder="Votre pseudo" required />
                                 </div>
                             </div>
 
@@ -154,7 +198,7 @@ const Connexion = () => {
                                 </div>
                             </div>
 
-                            {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+                            {error && <p className="text-xs text-red-500 text-center bg-red-500/10 p-2 rounded">{error}</p>}
 
                             <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 group">
                                 Se connecter <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
