@@ -21,11 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-/**
- * Configuration de sécurité Spring Security
- *
- * Gère l'authentification et l'autorisation de l'application
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -37,38 +32,27 @@ public class SecurityConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * Configuration de la chaîne de filtres de sécurité
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Routes publiques (sans authentification)
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/formations/**").permitAll()
                         .requestMatchers("/api/intervenant/**").hasAuthority("INTERVENANT")
-                        // ✅ Routes protégées par rôle
                         .requestMatchers(HttpMethod.GET, "/api/admin/formations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin/sessions").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/auth/create-admin-secret").hasAuthority("ADMIN")
-                        // ✅ Toutes les autres routes nécessitent une authentification
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
-        // ❌ RETIRÉ : .authenticationProvider(authenticationProvider());
-        // Spring Boot le configure automatiquement
 
         return http.build();
     }
 
-    /**
-     * Provider d'authentification
-     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -77,17 +61,11 @@ public class SecurityConfig {
         return provider;
     }
 
-    /**
-     * AuthenticationManager pour gérer l'authentification
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * Configuration CORS
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

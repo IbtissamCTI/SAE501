@@ -13,9 +13,6 @@ public class Apprentie {
     private String prenom;
     private String email;
 
-    // ============================================
-    // CONSTRUCTEURS (Obligatoire pour JPA)
-    // ============================================
 
     public Apprentie() {
     }
@@ -27,9 +24,6 @@ public class Apprentie {
         this.email = email;
     }
 
-    // ============================================
-    // GETTERS ET SETTERS (Remplace Lombok)
-    // ============================================
 
     public Long getIdUser() {
         return idUser;

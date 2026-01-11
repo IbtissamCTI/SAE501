@@ -27,7 +27,6 @@ public class Session {
     @JoinColumn(name = "intervenant_id")
     private Utilisateur intervenant;
 
-    // ✅ AJOUT DE LA RELATION AVEC LES PARTICIPANTS
     @ManyToMany
     @JoinTable(
             name = "session_participants",
@@ -38,7 +37,6 @@ public class Session {
 
     public Session() {}
 
-    // Getters et Setters existants
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public LocalDate getDateDebut() { return dateDebut; }
@@ -58,7 +56,6 @@ public class Session {
     public Utilisateur getIntervenant() { return intervenant; }
     public void setIntervenant(Utilisateur i) { this.intervenant = i; }
 
-    // ✅ NOUVEAUX GETTERS/SETTERS POUR LES PARTICIPANTS
     public List<Utilisateur> getParticipants() {
         return participants;
     }
@@ -67,7 +64,6 @@ public class Session {
         this.participants = participants;
     }
 
-    // ✅ MÉTHODES UTILITAIRES
     public void addParticipant(Utilisateur apprenti) {
         this.participants.add(apprenti);
     }

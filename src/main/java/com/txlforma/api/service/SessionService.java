@@ -66,7 +66,6 @@ public class SessionService {
         return sessionRepo.findByIntervenant(intervenant);
     }
 
-    // ✅ NOUVELLE MÉTHODE pour le Dashboard Apprenti
     public List<Session> getSessionsPourApprenti(Long idApprenti) {
         return sessionRepo.findSessionsByParticipantId(idApprenti);
     }

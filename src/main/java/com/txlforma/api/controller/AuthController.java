@@ -25,8 +25,6 @@ public class AuthController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    // ... autres méthodes (register, etc.) ...
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String pseudo = loginRequest.get("pseudo");
@@ -42,15 +40,11 @@ public class AuthController {
         if (userOpt.isPresent()) {
             Utilisateur user = userOpt.get();
 
-            // Création de la réponse JSON
             Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId()); // ✅ C'EST LA CORRECTION CRUCIALE
+            response.put("id", user.getId());
             response.put("pseudo", user.getPseudo());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
-
-            // Si vous générez un token, ajoutez-le ici :
-            // response.put("token", "Basic " + Base64...); ou jwt
 
             return ResponseEntity.ok(response);
         }

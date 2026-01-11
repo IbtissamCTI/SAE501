@@ -21,7 +21,6 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // 1. CRÉATION DE L'ADMIN (Identifiants : admin.amdin / test123)
         if (userRepo.count() == 0) {
             Utilisateur admin = new Utilisateur();
             admin.setNom("Admin");
@@ -29,9 +28,7 @@ public class DataSeeder implements CommandLineRunner {
             admin.setEmail("admin@txlforma.com");
             admin.setMotDePasse("test123");
             authService.creerAdmin(admin);
-            System.out.println("✅ Admin créé : admin.amdin");
+            System.out.println(" Admin créé : admin.amdin");
         }
-
-
     }
 }

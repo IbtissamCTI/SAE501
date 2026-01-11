@@ -27,7 +27,6 @@ public class Resultat {
     public Resultat() {
     }
 
-    // Constructeur complet
     public Resultat(Utilisateur apprenti, Session session, Double note,
                     String appreciation, Boolean valide, LocalDate dateExamen) {
         this.apprenti = apprenti;
@@ -49,7 +48,6 @@ public class Resultat {
 
     public Double getNote() { return note; }
 
-    // ✅ La règle métier est ici : si on met une note, on calcule la réussite
     public void setNote(Double note) {
         this.note = note;
         if (note != null) {

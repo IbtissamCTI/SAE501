@@ -8,9 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Entité Utilisateur - Implémente UserDetails pour Spring Security
- */
+
 @Entity
 @Table(name = "utilisateurs")
 public class Utilisateur implements UserDetails {
@@ -34,9 +32,6 @@ public class Utilisateur implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // ============================================
-    // CONSTRUCTEURS
-    // ============================================
 
     public Utilisateur() {
     }
@@ -51,9 +46,6 @@ public class Utilisateur implements UserDetails {
         this.role = role;
     }
 
-    // ============================================
-    // GETTERS ET SETTERS
-    // ============================================
 
     public Long getId() {
         return id;
@@ -111,9 +103,6 @@ public class Utilisateur implements UserDetails {
         this.role = role;
     }
 
-    // ============================================
-    // IMPLÉMENTATION DE UserDetails
-    // ============================================
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

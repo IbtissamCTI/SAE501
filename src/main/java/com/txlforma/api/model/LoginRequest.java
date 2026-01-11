@@ -4,10 +4,9 @@ public class LoginRequest {
     private String pseudo;
     private String motDePasse;
 
-    // Constructeur vide (nécessaire pour que Spring puisse créer l'objet)
     public LoginRequest() {}
 
-    // Getters
+
     public String getPseudo() {
         return pseudo;
     }
@@ -16,7 +15,6 @@ public class LoginRequest {
         return motDePasse;
     }
 
-    // Setters
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
     }

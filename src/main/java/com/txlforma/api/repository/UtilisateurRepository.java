@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
     Optional<Utilisateur> findByPseudo(String pseudo);
 
-    // MÉTHODE INDISPENSABLE POUR AdminController
     List<Utilisateur> findByRole(Role role);
 }

@@ -20,7 +20,6 @@ public class ResultatController {
     @Autowired
     private ResultatService service;
 
-    // ✅ NOUVELLE ROUTE : Télécharger la certification
     @GetMapping("/certification/{id}")
     public ResponseEntity<byte[]> téléchargerCertification(@PathVariable Long id) {
         try {
@@ -56,6 +55,4 @@ public class ResultatController {
     public ResponseEntity<List<Resultat>> getResultatsByApprenti(@PathVariable Long id) {
         return ResponseEntity.ok(service.getNotesApprenti(id));
     }
-
-    // Autres méthodes GetMapping...
 }

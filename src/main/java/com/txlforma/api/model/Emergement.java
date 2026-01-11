@@ -3,9 +3,7 @@ package com.txlforma.api.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Entité Emergement - Gestion des présences aux sessions
- */
+
 @Entity
 @Table(name = "emergements")
 public class Emergement {
@@ -29,9 +27,6 @@ public class Emergement {
     @Column(length = 500)
     private String commentaire;
 
-    // ============================================
-    // CONSTRUCTEURS
-    // ============================================
 
     public Emergement() {
     }
@@ -44,9 +39,6 @@ public class Emergement {
         this.present = present;
     }
 
-    // ============================================
-    // GETTERS ET SETTERS
-    // ============================================
 
     public Long getId() {
         return id;

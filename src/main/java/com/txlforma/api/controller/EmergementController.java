@@ -4,7 +4,7 @@ import com.txlforma.api.model.Emergement;
 import com.txlforma.api.service.EmergementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication; // Pour la sécurité
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,12 +13,9 @@ public class EmergementController {
 
     @Autowired private EmergementService service;
 
-    // APPRENTI : Signer sa présence
-    // Plus besoin de passer l'ID apprenti, on le prend du token de sécurité (Authentication)
     @PostMapping("/signer")
     public ResponseEntity<?> signer(@RequestParam Long idSession, Authentication authentication) {
         try {
-            // authentication.getName() retourne le pseudo de l'utilisateur connecté
             Emergement e = service.signerPresence(authentication.getName(), idSession);
             return ResponseEntity.ok(e);
         } catch (RuntimeException e) {

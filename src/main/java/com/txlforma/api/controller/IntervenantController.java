@@ -23,7 +23,6 @@ public class IntervenantController {
     @Autowired
     private UtilisateurRepository userRepo;
 
-    // ✅ RÉPARE L'ERREUR 404 : /api/intervenant/sessions
     @GetMapping("/sessions")
     public ResponseEntity<List<Session>> getMySessions(@AuthenticationPrincipal UserDetails userDetails) {
         Utilisateur currentIntervenant = userRepo.findByPseudo(userDetails.getUsername())
@@ -31,14 +30,11 @@ public class IntervenantController {
         return ResponseEntity.ok(sessionService.getPlanningIntervenant(currentIntervenant.getId()));
     }
 
-    // ✅ RÉPARE L'ERREUR 404 : /api/intervenant/planning
     @GetMapping("/planning")
     public ResponseEntity<List<Session>> getMyPlanning(@AuthenticationPrincipal UserDetails userDetails) {
-        // Le planning et les sessions sont identiques pour l'affichage intervenant
         return getMySessions(userDetails);
     }
 
-    // ✅ RÉPARE L'ERREUR 404 : /api/intervenant/profil
     @PutMapping("/profil")
     public ResponseEntity<Utilisateur> updateProfile(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Utilisateur updatedData) {
         Utilisateur user = userRepo.findByPseudo(userDetails.getUsername())

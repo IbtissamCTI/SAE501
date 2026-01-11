@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sessions")
-@CrossOrigin(origins = "http://localhost:5173") // Important pour React
+@CrossOrigin(origins = "http://localhost:5173")
 public class SessionController {
 
     @Autowired private SessionService service;
@@ -45,10 +45,8 @@ public class SessionController {
         return ResponseEntity.ok("Inscription réussie");
     }
 
-    // ✅ Endpoint corrigé pour le Dashboard
     @GetMapping("/mes-sessions")
     public ResponseEntity<List<Session>> getSessionsApprenti(@RequestParam Long idApprenti) {
-        // On passe par le service, pas par le repository directement
         List<Session> sessions = service.getSessionsPourApprenti(idApprenti);
 
         if (sessions.isEmpty()) {
