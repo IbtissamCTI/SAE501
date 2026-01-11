@@ -1,545 +1,246 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-	Atom,
-	Server,
-	Layers,
-	BarChart,
-	Cloud,
-	Database,
-	LayoutTemplate,
-	Coffee,
-	FileCode,
-	Container,
-	CloudLightning,
-	CheckCircle,
-	Circle,
-	Lock,
-	Calendar,
-	ChevronRight,
+    Atom, Server, Layers, BarChart, Cloud, Database, LayoutTemplate,
+    CheckCircle, Lock, Calendar, MapPin, Clock, LogOut, User
 } from "lucide-react";
-import { getFormationsByCategorie, getFormationDetails, startStripePayment, getCurrentUser } from "../data/authService";
+import PayPalPart from "./Paypal";
 
-// --- DONNÉES ---
-const CATEGORIES = [
-	{
-		id: "front",
-		label: "Front-End",
-		sub: "Interfaces & UX",
-		icon: LayoutTemplate,
-		color: "text-blue-400",
-		bg: "bg-blue-500/20",
-	},
-	{
-		id: "back",
-		label: "Back-End",
-		sub: "Logique & Data",
-		icon: Server,
-		color: "text-green-400",
-		bg: "bg-green-500/20",
-	},
-	{
-		id: "fullstack",
-		label: "Fullstack",
-		sub: "360°",
-		icon: Layers,
-		color: "text-purple-400",
-		bg: "bg-purple-500/20",
-	},
-	{
-		id: "data",
-		label: "Data & IA",
-		sub: "Analyse & ML",
-		icon: BarChart,
-		color: "text-yellow-400",
-		bg: "bg-yellow-500/20",
-	},
-	{
-		id: "devops",
-		label: "DevOps",
-		sub: "Cloud & Infra",
-		icon: Cloud,
-		color: "text-red-400",
-		bg: "bg-red-500/20",
-	},
-];
-
-const COURSES_DATA = {
-	front: [
-		{
-			id: "react",
-			name: "React.js",
-			icon: Atom,
-			color: "text-blue-400",
-			desc: "Maîtrisez la bibliothèque N°1. Hooks, Context API et Redux.",
-		},
-		{
-			id: "vue",
-			name: "Vue.js",
-			icon: LayoutTemplate,
-			color: "text-green-400",
-			desc: "Le framework progressif. Composition API et performance.",
-		},
-		{
-			id: "angular",
-			name: "Angular",
-			icon: Layers,
-			color: "text-red-500",
-			desc: "Le framework complet. TypeScript et RxJS pour l'entreprise.",
-		},
-		{
-			id: "next",
-			name: "Next.js",
-			icon: Server,
-			color: "text-white",
-			desc: "React en production. SSR et SEO natif.",
-		},
-	],
-	back: [
-		{
-			id: "node",
-			name: "Node.js",
-			icon: Server,
-			color: "text-green-500",
-			desc: "JS côté serveur. API REST rapides avec Express.",
-		},
-		{
-			id: "python",
-			name: "Python",
-			icon: FileCode,
-			color: "text-yellow-300",
-			desc: "Polyvalent. Django/Flask pour le web, scripts.",
-		},
-		{
-			id: "java",
-			name: "Java / Spring",
-			icon: Coffee,
-			color: "text-red-400",
-			desc: "Standard industriel. Microservices robustes.",
-		},
-	],
-	fullstack: [
-		{
-			id: "mern",
-			name: "Stack MERN",
-			icon: Layers,
-			color: "text-blue-300",
-			desc: "MongoDB, Express, React, Node. Autonomie totale.",
-		},
-		{
-			id: "next-full",
-			name: "Next.js Full",
-			icon: Atom,
-			color: "text-white",
-			desc: "App complète, API et Front avec un seul framework.",
-		},
-	],
-	data: [
-		{
-			id: "sql",
-			name: "SQL Expert",
-			icon: Database,
-			color: "text-gray-300",
-			desc: "Bases relationnelles et requêtes complexes.",
-		},
-		{
-			id: "python-data",
-			name: "Python Data",
-			icon: BarChart,
-			color: "text-yellow-300",
-			desc: "Pandas, NumPy. Analyse de données brutes.",
-		},
-	],
-	devops: [
-		{
-			id: "docker",
-			name: "Docker",
-			icon: Container,
-			color: "text-blue-500",
-			desc: "Conteneurisation pour déploiement fluide.",
-		},
-		{
-			id: "aws",
-			name: "AWS Cloud",
-			icon: CloudLightning,
-			color: "text-orange-400",
-			desc: "Cloud leader. EC2, S3 et Serverless.",
-		},
-	],
+const CATEGORIES_STYLES = {
+    "Front-End": { icon: LayoutTemplate, color: "text-blue-400", bg: "bg-blue-500/20", sub: "Interfaces & UX" },
+    "Back-End": { icon: Server, color: "text-green-400", bg: "bg-green-500/20", sub: "Logique & Data" },
+    "Fullstack": { icon: Layers, color: "text-purple-400", bg: "bg-purple-500/20", sub: "360° Architecture" },
+    "Data & IA": { icon: BarChart, color: "text-yellow-400", bg: "bg-yellow-500/20", sub: "Analyse & ML" },
+    "DevOps": { icon: Cloud, color: "text-red-400", bg: "bg-red-500/20", sub: "Cloud & Infra" },
+    "Default": { icon: Atom, color: "text-gray-400", bg: "bg-gray-500/20", sub: "Formation Technique" }
 };
 
-const SESSIONS_MOCK = [
-	{ id: 1, date: "10 Oct - 15 Oct", slot: "Complet", full: true },
-	{ id: 2, date: "24 Oct - 29 Oct", slot: "3 places restantes", full: false },
-	{ id: 3, date: "07 Nov - 12 Nov", slot: "8 places restantes", full: false },
-];
-
 export default function Formation() {
-	const [activeCategory, setActiveCategory] = useState("front");
-	const [selectedTech, setSelectedTech] = useState(null);
-	const [selectedSession, setSelectedSession] = useState(null);
-	const [isPaying, setIsPaying] = useState(false);
+    const [backendFormations, setBackendFormations] = useState([]);
+    const [backendSessions, setBackendSessions] = useState([]);
+    const [availableCategories, setAvailableCategories] = useState([]);
+    const [activeCategory, setActiveCategory] = useState(null);
+    const [selectedTech, setSelectedTech] = useState(null);
+    const [selectedSessionId, setSelectedSessionId] = useState(null);
+    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
-	// Références pour le scroll automatique
-	const techGridRef = useRef(null);
-	const detailsRef = useRef(null);
+    const techGridRef = useRef(null);
+    const detailsRef = useRef(null);
 
-	// Effet : Quand on change de catégorie, on reset la techno et on scroll vers la grille
-	useEffect(() => {
-		setSelectedTech(null);
-	}, [activeCategory]);
+    const handleLogout = () => {
+        localStorage.removeItem('authData');
+        localStorage.removeItem('user');
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        alert("Vous êtes déconnecté.");
+    };
 
-	// Effet : Scroll vers les détails quand une techno est choisie
-	useEffect(() => {
-		if (selectedTech && detailsRef.current) {
-			setTimeout(() => {
-				detailsRef.current.scrollIntoView({
-					behavior: "smooth",
-					block: "center",
-				});
-			}, 100);
-		}
-	}, [selectedTech]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const authData = localStorage.getItem('authData');
+                const userData = localStorage.getItem('user');
+                
+                if (authData) {
+                    setIsAuthenticated(true);
+                    if (userData) setCurrentUser(JSON.parse(userData));
+                }
 
-	const handlePayment = () => {
-		setIsPaying(true);
-		setTimeout(() => {
-			alert("Redirection vers Stripe...");
-			setIsPaying(false);
-		}, 1500);
-	};
+                const headers = authData ? {
+                    "Content-Type": "application/json",
+                    "Authorization": `Basic ${authData}`
+                } : { "Content-Type": "application/json" };
 
-	return (
-		<div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30">
-			{/* Style pour masquer la scrollbar */}
+                const [formationsRes, sessionsRes] = await Promise.all([
+                    fetch("http://localhost:8080/api/formations", { headers }),
+                    fetch("http://localhost:8080/api/sessions", { headers })
+                ]);
 
-			{/* --- HERO SECTION --- */}
-			<header className="text-center px-20 mb-20">
-				<h1 className="mt-14 font-bold text-9xl text-white">
-					Trouvez votre voie.{" "}
-				</h1>
-				<p className="text-gray-400 max-w-2xl mx-auto text-2xl mt-4">
-					Sélectionnez votre domaine, choisissez votre techno,
-					lancez-vous.
-				</p>
-			</header>
+                if (!formationsRes.ok || !sessionsRes.ok) {
+                    return; 
+                }
 
-			{/* --- ÉTAPE 1 : CARROUSEL CATÉGORIES --- */}
-			<section className="mb-20">
-				<div className="text-center mb-8">
-					<span className="text-xl font-bold text-blue-400 uppercase tracking-widest">
-						Étape 1
-					</span>
-					<h2 className="text-4xl font-bold mt-1">
-						Quel type de développeur êtes-vous ?
-					</h2>
-					<p className="text-2xl text-gray-500 mt-1">
-						Scrollez ou cliquez pour sélectionner
-					</p>
-				</div>
+                const formationsData = await formationsRes.json();
+                const sessionsData = await sessionsRes.json();
 
-				{/* Container Scroll Horizontal */}
-				<div className="flex overflow-x-auto hide-scrollbar gap-5 px-[10vw] md:justify-center py-10 snap-x mandatory">
-					{CATEGORIES.map((cat) => {
-						const isActive = activeCategory === cat.id;
-						const Icon = cat.icon;
+                setBackendFormations(formationsData);
+                setBackendSessions(sessionsData);
 
-						return (
-							<div
-								key={cat.id}
-								onClick={() => setActiveCategory(cat.id)}
-								className={`
-                                    snap-center shrink-0 w-[280px] p-8 rounded-2xl cursor-pointer transition-all duration-400 ease-out
-                                    flex flex-col items-center text-center
-                                    ${
-										isActive
-											? "bg-indigo-600 border-transparent shadow-[0_0_40px_rgba(79,70,229,0.4)] scale-110 z-10 opacity-100" // Fond violet actif
-											: "glass-card scale-90 opacity-60 hover:opacity-100"
-									}
-                                `}
-							>
-								<div
-									className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl ${
-										isActive
-											? "bg-white/20 text-white"
-											: `${cat.bg} ${cat.color}`
-									}`}
-								>
-									<Icon size={32} />
-								</div>
-								<h3 className="text-2xl font-bold mb-2">
-									{cat.label}
-								</h3>
-								<p
-									className={`text-xs ${
-										isActive
-											? "text-indigo-200"
-											: "text-gray-400"
-									}`}
-								>
-									{cat.sub}
-								</p>
-							</div>
-						);
-					})}
-				</div>
-			</section>
+                const uniqueCats = [...new Set(formationsData.map(f => f.categorie))];
+                setAvailableCategories(uniqueCats);
+                if (uniqueCats.length > 0 && !activeCategory) setActiveCategory(uniqueCats[0]);
 
-			{/* --- ÉTAPE 2 : GRILLE TECHNOS --- */}
-			<section
-				ref={techGridRef}
-				className="max-w-5xl mx-auto px-4 mb-20 min-h-[300px]"
-			>
-				<div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-500">
-					<span className="text-xs font-bold text-purple-400 uppercase tracking-widest">
-						Étape 2
-					</span>
-					<h2 className="text-2xl font-bold mt-1">
-						Choisissez votre technologie
-					</h2>
-					<p className="text-gray-400 text-sm mt-2">
-						Parcours compatibles avec{" "}
-						<span className="text-white font-bold">
-							{
-								CATEGORIES.find((c) => c.id === activeCategory)
-									?.label
-							}
-						</span>
-					</p>
-				</div>
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
+    }, []);
 
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					{COURSES_DATA[activeCategory]?.map((tech) => {
-						const Icon = tech.icon;
-						const isSelected = selectedTech?.id === tech.id;
+    useEffect(() => {
+        if (selectedTech && detailsRef.current) {
+            setTimeout(() => {
+                detailsRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 100);
+        }
+    }, [selectedTech]);
 
-						return (
-							<div
-								key={tech.id}
-								onClick={() => setSelectedTech(tech)}
-								className={`
-                                    p-6 rounded-xl cursor-pointer flex flex-col items-center gap-3 text-center transition-all duration-300
-                                    ${
-										isSelected
-											? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105 border-transparent" // Fond violet actif
-											: "glass-card hover:-translate-y-1 border-white/10"
-									}
-                                `}
-							>
-								<div
-									className={`mb-2 text-4xl ${
-										isSelected ? "text-white" : tech.color
-									}`}
-								>
-									<Icon size={40} />
-								</div>
-								<h4 className="font-bold text-lg">
-									{tech.name}
-								</h4>
-								<span
-									className={`text-[10px] uppercase px-2 py-1 rounded ${
-										isSelected
-											? "bg-white/20 text-white"
-											: "bg-white/10 text-gray-400"
-									}`}
-								>
-									5 Jours
-								</span>
-							</div>
-						);
-					})}
-				</div>
-			</section>
+    const handleSuccess = () => {
+        setSelectedSessionId(null);
+        setSelectedTech(null);
+    };
 
-			{/* --- ÉTAPE 3 : DÉTAILS & PAIEMENT --- */}
-			{selectedTech && (
-				<section
-					ref={detailsRef}
-					className="max-w-6xl mx-auto px-4 py-12 border-t border-white/10 bg-[#0a0a0a] animate-in slide-in-from-bottom-10 duration-700"
-				>
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-						{/* Colonne Gauche : Infos Cours */}
-						<div className="lg:col-span-2">
-							<div className="flex items-center gap-6 mb-8">
-								<div className="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
-									<selectedTech.icon
-										size={32}
-										className={selectedTech.color}
-									/>
-								</div>
-								<div>
-									<h2 className="text-3xl font-bold text-white">
-										{selectedTech.name} Intensif
-									</h2>
-									<span className="text-sm text-gray-400">
-										Formation intensive certifiante
-									</span>
-								</div>
-							</div>
+    const activeStyle = CATEGORIES_STYLES[activeCategory] || CATEGORIES_STYLES["Default"];
+    const filteredFormations = backendFormations.filter(f => f.categorie === activeCategory);
+    const filteredSessions = backendSessions.filter(s => s.formation?.id === selectedTech?.id);
 
-							<div className="prose prose-invert max-w-none text-gray-300 text-sm leading-relaxed mb-8">
-								<p className="text-lg mb-4">
-									{selectedTech.desc}
-								</p>
-								<ul className="space-y-3 pl-0">
-									<li className="flex gap-3 items-center">
-										<div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></div>
-										<span>
-											Projets réels encadrés par des
-											mentors seniors.
-										</span>
-									</li>
-									<li className="flex gap-3 items-center">
-										<div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></div>
-										<span>
-											Accès à la plateforme Novatio
-											pendant 12 mois.
-										</span>
-									</li>
-									<li className="flex gap-3 items-center">
-										<div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></div>
-										<span>
-											Certification de fin de parcours
-											reconnue.
-										</span>
-									</li>
-								</ul>
-							</div>
+    return (
+        <div className="min-h-screen bg-[#050505] text-white font-sans pt-40 pb-20 selection:bg-indigo-500/30 relative">
+            <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
 
-							{/* Stats */}
-							<div className="grid grid-cols-3 gap-4">
-								<div className="p-4 rounded-lg bg-white/5 text-center">
-									<div className="text-2xl font-bold text-white">
-										5 Jours
-									</div>
-									<div className="text-xs text-gray-500">
-										Durée
-									</div>
-								</div>
-								<div className="p-4 rounded-lg bg-white/5 text-center">
-									<div className="text-2xl font-bold text-white">
-										Expert
-									</div>
-									<div className="text-xs text-gray-500">
-										Niveau
-									</div>
-								</div>
-								<div className="p-4 rounded-lg bg-white/5 text-center">
-									<div className="text-2xl font-bold text-white">
-										1490€
-									</div>
-									<div className="text-xs text-gray-500">
-										CPF Ok
-									</div>
-								</div>
-							</div>
-						</div>
+            {/* J'ai changé top-6 en top-28 pour descendre le bloc sous ta navbar */}
+            <div className="absolute top-28 right-10 flex gap-4 z-50">
+                {isAuthenticated ? (
+                    <div className="flex items-center gap-4 bg-[#0a0a0a] px-4 py-2 rounded-full border border-white/20 shadow-xl">
+                        <div className="flex items-center gap-2 text-sm text-indigo-300">
+                            <User size={16}/> 
+                            <span className="font-bold">{currentUser?.pseudo || "Utilisateur"}</span>
+                        </div>
+                        <button onClick={handleLogout} className="text-xs bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-3 py-1 rounded transition-all flex items-center gap-1">
+                            <LogOut size={12}/>
+                        </button>
+                    </div>
+                ) : null} 
+            </div>
 
-						{/* Colonne Droite : Calendrier & Paiement */}
-						<div className="lg:col-span-1">
-							<div className="glass-card p-6 rounded-xl sticky top-24">
-								<h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-									Prochaines Sessions
-								</h3>
-								<p className="text-xs text-gray-400 mb-6">
-									Sélectionnez une date (max 10 places)
-								</p>
+            <header className="text-center px-20 mb-20">
+                <h1 className="mt-14 font-bold text-9xl text-white tracking-tighter italic uppercase">Novatio</h1>
+                <p className="text-gray-400 max-w-2xl mx-auto text-2xl mt-4">
+                    Parcourez notre catalogue et réservez votre session en direct.
+                </p>
+            </header>
 
-								<div className="space-y-3">
-									{SESSIONS_MOCK.map((session) => (
-										<div
-											key={session.id}
-											onClick={() =>
-												!session.full &&
-												setSelectedSession(session.id)
-											}
-											className={`
-                                                p-3 border rounded-lg flex justify-between items-center transition-all duration-200
-                                                ${
-													session.full
-														? "opacity-50 cursor-not-allowed border-transparent bg-red-900/10"
-														: "cursor-pointer hover:border-white/30 border-white/10"
-												}
-                                                ${
-													selectedSession ===
-														session.id &&
-													!session.full
-														? "bg-indigo-600 border-transparent" // Fond violet actif session
-														: ""
-												}
-                                            `}
-										>
-											<div>
-												<div className="font-bold text-sm text-white">
-													{session.date}
-												</div>
-												<div
-													className={`text-xs mt-0.5 ${
-														session.full
-															? "text-red-400"
-															: selectedSession ===
-															  session.id
-															? "text-indigo-200"
-															: "text-green-400"
-													}`}
-												>
-													{session.slot}
-												</div>
-											</div>
-											{session.full ? (
-												<span className="text-[10px] font-bold text-red-500">
-													Complet
-												</span>
-											) : selectedSession ===
-											  session.id ? (
-												<CheckCircle
-													className="text-white"
-													size={18}
-												/>
-											) : (
-												<Circle
-													className="text-gray-600"
-													size={18}
-												/>
-											)}
-										</div>
-									))}
-								</div>
+            <section className="mb-20">
+                <div className="text-center mb-8">
+                    <span className="text-xl font-bold text-blue-400 uppercase tracking-widest">Étape 1</span>
+                    <h2 className="text-4xl font-bold mt-1">Quelle spécialité vous intéresse ?</h2>
+                </div>
 
-								{/* Zone Paiement */}
-								{selectedSession && (
-									<div className="mt-6 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-2">
-										<div className="flex justify-between items-center mb-4">
-											<span className="text-sm text-gray-400">
-												Total à payer
-											</span>
-											<span className="text-xl font-bold text-white">
-												1490 €
-											</span>
-										</div>
-										<button
-											onClick={handlePayment}
-											disabled={isPaying}
-											className="w-full py-3 rounded-lg bg-white text-black font-bold hover:bg-gray-200 transition-all shadow-lg shadow-white/10 flex justify-center items-center gap-2"
-										>
-											{isPaying ? (
-												"Traitement..."
-											) : (
-												<>
-													<Lock size={14} /> Passer au
-													paiement
-												</>
-											)}
-										</button>
-										<p className="text-[10px] text-gray-500 text-center mt-2">
-											Paiement sécurisé via Stripe
-										</p>
-									</div>
-								)}
-							</div>
-						</div>
-					</div>
-				</section>
-			)}
-		</div>
-	);
+                <div className="flex overflow-x-auto hide-scrollbar gap-5 px-[10vw] md:justify-center py-10 snap-x mandatory">
+                    {availableCategories.map((catName) => {
+                        const style = CATEGORIES_STYLES[catName] || CATEGORIES_STYLES["Default"];
+                        const isActive = activeCategory === catName;
+                        const Icon = style.icon;
+
+                        return (
+                            <div key={catName} onClick={() => { setActiveCategory(catName); setSelectedTech(null); }}
+                                className={`snap-center shrink-0 w-[280px] p-8 rounded-2xl cursor-pointer transition-all duration-400
+                                ${isActive ? "bg-indigo-600 shadow-[0_0_40px_rgba(79,70,229,0.4)] scale-110 opacity-100" : "glass-card scale-90 opacity-60 hover:opacity-100"}`}>
+                                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl ${isActive ? "bg-white/20 text-white" : `${style.bg} ${style.color}`}`}>
+                                    <Icon size={32} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2">{catName}</h3>
+                                <p className={`text-xs ${isActive ? "text-indigo-200" : "text-gray-400"}`}>{style.sub}</p>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
+            <section ref={techGridRef} className="max-w-5xl mx-auto px-4 mb-20 min-h-[300px]">
+                <div className="text-center mb-10 animate-in slide-in-from-bottom-4 duration-500">
+                    <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Étape 2</span>
+                    <h2 className="text-2xl font-bold mt-1">Choisissez votre technologie</h2>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {filteredFormations.map((tech) => (
+                        <div key={tech.id} onClick={() => setSelectedTech(tech)}
+                            className={`p-6 rounded-xl cursor-pointer flex flex-col items-center gap-3 text-center transition-all duration-300
+                            ${selectedTech?.id === tech.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105" : "glass-card hover:-translate-y-1 border-white/10"}`}>
+                            <div className={`mb-2 text-4xl ${selectedTech?.id === tech.id ? "text-white" : activeStyle.color}`}>
+                                <activeStyle.icon size={40} />
+                            </div>
+                            <h4 className="font-bold text-lg">{tech.titre}</h4>
+                            <span className="text-[10px] uppercase bg-white/10 px-2 py-1 rounded text-gray-400">{tech.dureeHeures}h</span>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {selectedTech && (
+                <section ref={detailsRef} className="max-w-6xl mx-auto px-4 py-12 border-t border-white/10 bg-[#0a0a0a] animate-in slide-in-from-bottom-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        <div className="lg:col-span-2">
+                            <h2 className="text-3xl font-bold mb-6 uppercase italic tracking-tighter">{selectedTech.titre} Intensif</h2>
+                            <p className="text-gray-300 text-lg leading-relaxed mb-8">{selectedTech.description}</p>
+                            
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                                <div className="p-4 rounded-lg bg-white/5"><div className="text-2xl font-bold">{selectedTech.dureeHeures}h</div><div className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Durée</div></div>
+                                <div className="p-4 rounded-lg bg-white/5"><div className="text-2xl font-bold text-indigo-400">{selectedTech.prix}€</div><div className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Tarif</div></div>
+                                <div className="p-4 rounded-lg bg-white/5"><div className="text-xl font-bold text-green-400"><CheckCircle size={24} className="mx-auto" /></div><div className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Qualiopi</div></div>
+                            </div>
+                        </div>
+
+                        <div className="lg:col-span-1">
+                            <div className="glass-card p-6 rounded-xl border border-white/5">
+                                <h3 className="font-bold text-lg mb-6 flex items-center gap-2 italic uppercase tracking-tighter">
+                                    <Calendar size={18} className="text-indigo-500" /> Prochaines Sessions
+                                    {/* Pour debug : Afficher si on est connecté */}
+                                    <span className={`text-[10px] ml-auto px-2 py-1 rounded ${isAuthenticated ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                        {isAuthenticated ? 'Connecté' : 'Non connecté'}
+                                    </span>
+                                </h3>
+
+                                <div className="space-y-3">
+                                    {filteredSessions.length > 0 ? filteredSessions.map((s) => (
+                                        <div key={s.id} onClick={() => setSelectedSessionId(s.id)}
+                                            className={`p-3 border rounded-lg cursor-pointer transition-all ${selectedSessionId === s.id ? "bg-indigo-600 border-transparent shadow-lg" : "border-white/10 hover:border-white/30"}`}>
+                                            <div className="font-bold text-sm">Du {s.dateDebut} au {s.dateFin}</div>
+                                            <div className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">
+                                                <div className="flex items-center gap-1"><MapPin size={10}/> {s.lieu} - {s.salle}</div>
+                                                <div className="flex items-center gap-1"><Clock size={10}/> {s.horaires}</div>
+                                            </div>
+                                        </div>
+                                    )) : <p className="text-xs text-gray-500 italic">Aucune session ouverte pour cette formation.</p>}
+                                </div>
+
+                                {selectedSessionId && (
+                                    <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-2">
+                                        {!isAuthenticated ? (
+                                            <div className="text-center p-6 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                                <Lock className="mx-auto mb-3 text-red-400" size={32} />
+                                                <h3 className="text-lg font-bold text-red-400 mb-2">CONNEXION REQUISE</h3>
+                                                <p className="text-sm text-gray-300 mb-4">
+                                                    Vous devez être connecté pour réserver.
+                                                </p>
+                                                <a href="/connexion" className="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors uppercase text-sm tracking-wider">
+                                                    Se connecter
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="mb-4 text-center">
+                                                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Paiement Sécurisé</span>
+                                                    <p className="text-[10px] text-gray-500">Montant test : {selectedTech.prix}€</p>
+                                                </div>
+                                                
+                                                <PayPalPart 
+                                                    prix={selectedTech.prix}
+                                                    titre={selectedTech.titre}
+                                                    sessionId={selectedSessionId}
+                                                    onSuccess={handleSuccess}
+                                                />
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+        </div>
+    );
 }

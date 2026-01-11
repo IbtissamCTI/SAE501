@@ -10,9 +10,9 @@ const AdminDashboard = () => {
   const [profs, setProfs] = useState([]);
   const [formations, setFormations] = useState([]);
   const [sessions, setSessions] = useState([]);
-  const [modal, setModal] = useState({ type: null }); // 'prof', 'formation', 'session'
+  const [modal, setModal] = useState({ type: null });
 
-  // Chargement synchro avec le back
+  // Chargement des données
   useEffect(() => {
     const load = async () => {
       try {
@@ -29,17 +29,29 @@ const AdminDashboard = () => {
   const onAddProf = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
+    
+    // NOTE : On n'envoie pas le pseudo ici. 
+    // Le Backend (AuthService) va le générer automatiquement (nom.prenom)
     const payload = {
-      nom: fd.get("nom"), prenom: fd.get("prenom"),
-      pseudo: fd.get("pseudo"), motDePasse: fd.get("mdp"),
+      nom: fd.get("nom"), 
+      prenom: fd.get("prenom"),
+      email: fd.get("email"), // Obligatoire !
+      motDePasse: fd.get("mdp"),
       role: "INTERVENANT"
     };
-    const res = await createIntervenant(payload);
-    setProfs([...profs, res]);
-    setModal({ type: null });
+
+    try {
+        const res = await createIntervenant(payload);
+        setProfs([...profs, res]); // Mise à jour de la liste
+        setModal({ type: null });  // Fermeture modale
+        alert(`Intervenant créé avec succès ! Login généré : ${res.pseudo}`);
+    } catch (error) {
+        console.error(error);
+        alert("Erreur : Cet email existe déjà ou une autre erreur est survenue.");
+    }
   };
 
-  // 2. Créer Formation (avec Prix)
+  // 2. Créer Formation
   const onAddFormation = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -53,7 +65,7 @@ const AdminDashboard = () => {
     setModal({ type: null });
   };
 
-  // 3. Créer Session (Attribution Formation + Intervenant + Détails)
+  // 3. Créer Session
   const onAddSession = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -95,10 +107,11 @@ const AdminDashboard = () => {
           <table className="w-full text-left border-collapse text-sm">
             <thead className="bg-zinc-900/50 text-zinc-500">
               {activeTab === 'sessions' && <tr><th className="p-4">Formation</th><th className="p-4">Intervenant</th><th className="p-4">Lieu / Salle</th><th className="p-4">Dates</th></tr>}
-              {activeTab === 'intervenants' && <tr><th className="p-4">Nom Complet</th><th className="p-4">Pseudo</th><th className="p-4">ID</th></tr>}
+              {activeTab === 'intervenants' && <tr><th className="p-4">Nom Complet</th><th className="p-4">Email</th><th className="p-4">Pseudo (Auto)</th><th className="p-4">ID</th></tr>}
               {activeTab === 'formations' && <tr><th className="p-4">Titre</th><th className="p-4">Catégorie</th><th className="p-4">Prix</th><th className="p-4">Durée</th></tr>}
             </thead>
             <tbody>
+              
               {activeTab === 'sessions' && sessions.map(s => (
                 <tr key={s.id} className="border-t border-zinc-800/50 hover:bg-zinc-800/20">
                   <td className="p-4 font-bold text-indigo-400">{s.formation?.titre}</td>
@@ -107,13 +120,16 @@ const AdminDashboard = () => {
                   <td className="p-4 text-xs font-mono">{s.dateDebut} / {s.dateFin}</td>
                 </tr>
               ))}
+              
               {activeTab === 'intervenants' && profs.map(p => (
                 <tr key={p.id} className="border-t border-zinc-800/50">
                   <td className="p-4 font-bold">{p.prenom} {p.nom}</td>
-                  <td className="p-4 text-zinc-400">{p.pseudo}</td>
+                  <td className="p-4 text-zinc-400">{p.email}</td>
+                  <td className="p-4 text-zinc-400 font-mono text-xs bg-zinc-800/50 px-2 py-1 rounded w-fit">{p.pseudo}</td>
                   <td className="p-4 text-zinc-600">#{p.id}</td>
                 </tr>
               ))}
+
               {activeTab === 'formations' && formations.map(f => (
                 <tr key={f.id} className="border-t border-zinc-800/50">
                   <td className="p-4 font-bold">{f.titre}</td>
@@ -142,7 +158,12 @@ const AdminDashboard = () => {
                   <input name="prenom" placeholder="Prénom" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/>
                   <input name="nom" placeholder="Nom" className="bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/>
                 </div>
-                <input name="pseudo" placeholder="Pseudo" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/>
+                
+                {/* Email Obligatoire */}
+                <input name="email" type="email" placeholder="Email professionnel" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/>
+
+                {/* Pas de champ Pseudo ici : il sera généré automatiquement par le backend */}
+                
                 <input name="mdp" type="password" placeholder="Mot de passe" className="w-full bg-zinc-900 p-3 rounded-lg border border-zinc-800" required/>
                 <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg">CRÉER</button>
               </form>
@@ -187,6 +208,6 @@ const AdminDashboard = () => {
       )}
     </div>
   );
-};//bl  lblznjdbzhdizaojduozabyizahuodozadbzehfdbyhbyie
+};
 
 export default AdminDashboard;
