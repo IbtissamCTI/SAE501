@@ -3,8 +3,8 @@ services:
     image: postgres:15
     container_name: txlforma_db
     environment:
-      POSTGRES_USER: txlforma
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: txlformadb
+      POSTGRES_USER: ibtissam
+      POSTGRES_PASSWORD: sae501
+      POSTGRES_DB: txlforma
     ports:
       - "5432:5432"

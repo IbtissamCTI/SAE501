@@ -8,7 +8,6 @@ import com.txlforma.api.repository.UtilisateurRepository;
 import com.txlforma.api.repository.FormationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -61,11 +60,15 @@ public class SessionService {
         }
     }
 
-    // ✅ MÉTHODE AJOUTÉE : Récupère le planning d'un intervenant
     public List<Session> getPlanningIntervenant(Long idIntervenant) {
         Utilisateur intervenant = userRepo.findById(idIntervenant)
                 .orElseThrow(() -> new RuntimeException("Intervenant introuvable"));
         return sessionRepo.findByIntervenant(intervenant);
+    }
+
+    // ✅ NOUVELLE MÉTHODE pour le Dashboard Apprenti
+    public List<Session> getSessionsPourApprenti(Long idApprenti) {
+        return sessionRepo.findSessionsByParticipantId(idApprenti);
     }
 
     public void deleteSession(Long id) {

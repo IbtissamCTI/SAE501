@@ -1,37 +1,60 @@
 package com.txlforma.api.controller;
 
-import com.txlforma.api.model.LoginRequest;
 import com.txlforma.api.model.Utilisateur;
-import com.txlforma.api.service.AuthService;
+import com.txlforma.api.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
-    @Autowired private AuthService service;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    @PostMapping("/register")
-    public ResponseEntity<Utilisateur> register(@RequestBody Utilisateur u) {
-        return ResponseEntity.ok(service.inscrire(u));
-    }
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
-    @PostMapping("/create-admin-secret")
-    public ResponseEntity<Utilisateur> createAdmin(@RequestBody Utilisateur u) {
-        return ResponseEntity.ok(service.creerAdmin(u));
-    }
+    // ... autres méthodes (register, etc.) ...
 
-    // ✅ LA ROUTE POUR REACT
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            Utilisateur u = service.login(loginRequest.getPseudo(), loginRequest.getMotDePasse());
-            return ResponseEntity.ok(u);
-        } catch (RuntimeException e) {
-            // Renvoie une erreur 401 si login raté
-            return ResponseEntity.status(401).body("Erreur : " + e.getMessage());
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
+        String pseudo = loginRequest.get("pseudo");
+        String motDePasse = loginRequest.get("motDePasse");
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(pseudo, motDePasse));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Optional<Utilisateur> userOpt = utilisateurRepository.findByPseudo(pseudo);
+
+        if (userOpt.isPresent()) {
+            Utilisateur user = userOpt.get();
+
+            // Création de la réponse JSON
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getId()); // ✅ C'EST LA CORRECTION CRUCIALE
+            response.put("pseudo", user.getPseudo());
+            response.put("email", user.getEmail());
+            response.put("role", user.getRole());
+
+            // Si vous générez un token, ajoutez-le ici :
+            // response.put("token", "Basic " + Base64...); ou jwt
+
+            return ResponseEntity.ok(response);
         }
+
+        return ResponseEntity.status(401).body("Erreur d'authentification");
     }
 }

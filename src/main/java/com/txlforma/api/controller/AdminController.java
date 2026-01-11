@@ -19,6 +19,7 @@ public class AdminController {
     @Autowired private FormationRepository formationRepository;
     @Autowired private UtilisateurRepository utilisateurRepository;
 
+    // --- GESTION INTERVENANTS ---
     @GetMapping("/intervenants")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Utilisateur>> getIntervenants() {
@@ -31,6 +32,15 @@ public class AdminController {
         return ResponseEntity.ok(service.creerIntervenant(u));
     }
 
+    // --- GESTION APPRENTIS (NOUVEAU) ---
+    @GetMapping("/apprentis")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Utilisateur>> getApprentis() {
+        // Récupère tous les utilisateurs ayant le rôle APPRENTI
+        return ResponseEntity.ok(utilisateurRepository.findByRole(Role.APPRENTI));
+    }
+
+    // --- GESTION FORMATIONS ---
     @GetMapping("/formations")
     public ResponseEntity<List<Formation>> getFormations() {
         return ResponseEntity.ok(formationRepository.findAll());
@@ -42,6 +52,7 @@ public class AdminController {
         return ResponseEntity.ok(formationRepository.save(f));
     }
 
+    // --- GESTION SESSIONS ---
     @GetMapping("/sessions")
     public ResponseEntity<List<Session>> getSessions() {
         return ResponseEntity.ok(sessionRepository.findAll());
