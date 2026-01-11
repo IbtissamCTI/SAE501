@@ -47,3 +47,13 @@ export const updateSession = async (id, s) => {
     });
     return await response.json();
 };
+
+export const getApprentis = async () => {
+    const authData = localStorage.getItem("authData");
+    const response = await fetch("http://localhost:8080/api/admin/apprentis", {
+        headers: { "Authorization": `Basic ${authData}` }
+    });
+    if (!response.ok) throw new Error("Erreur chargement apprentis");
+    return await response.json();
+};
+

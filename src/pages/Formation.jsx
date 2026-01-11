@@ -3,7 +3,7 @@ import {
     Atom, Server, Layers, BarChart, Cloud, Database, LayoutTemplate,
     CheckCircle, Lock, Calendar, MapPin, Clock, LogOut, User
 } from "lucide-react";
-import PayPalPart from "./Paypal";
+import PayPalPart from "./PaypalPart";
 
 const CATEGORIES_STYLES = {
     "Front-End": { icon: LayoutTemplate, color: "text-blue-400", bg: "bg-blue-500/20", sub: "Interfaces & UX" },

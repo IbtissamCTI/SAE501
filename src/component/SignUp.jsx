@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
-import { register } from "../data/authService.js";
 
-// --- 1. COMPOSANT AUTHLAYOUT ---
+// --- 1. COMPOSANT AUTHLAYOUT (Ton design intact) ---
 const AuthLayout = ({ title, subtitle, children, footerText, footerActionText, footerActionLink }) => {
     return (
         <div className="min-h-screen bg-black text-white font-sans flex items-center justify-center p-4 relative overflow-hidden">
@@ -36,19 +35,20 @@ const AuthLayout = ({ title, subtitle, children, footerText, footerActionText, f
     );
 };
 
-// --- 2. COMPOSANT SIGNUP ADAPTÉ À TON BACKEND ---
+// --- 2. COMPOSANT SIGNUP (Logique corrigée + Ton style) ---
 const SignUp = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
+    // ✅ J'ai remis 'pseudo' car ton backend renvoyait une erreur sans lui
     const [formData, setFormData] = useState({
         prenom: "",
         nom: "",
+        pseudo: "", 
         email: "",
         motDePasse: ""
-        // ❌ PAS DE PSEUDO - ton backend le génère automatiquement
     });
 
     const handleChange = (e) => {
@@ -62,39 +62,19 @@ const SignUp = () => {
         setError(null);
         setSuccess(false);
 
-        // Validation côté client
-        if (!formData.prenom.trim() || !formData.nom.trim()) {
-            setError("Le prénom et le nom sont obligatoires");
-            setLoading(false);
-            return;
-        }
-
-        if (!formData.email.includes('@')) {
-            setError("Email invalide");
-            setLoading(false);
-            return;
-        }
-
-        if (formData.motDePasse.length < 6) {
-            setError("Le mot de passe doit contenir au moins 6 caractères");
+        // Validation simple
+        if (!formData.prenom || !formData.nom || !formData.pseudo || !formData.email || !formData.motDePasse) {
+            setError("Tous les champs sont obligatoires.");
             setLoading(false);
             return;
         }
 
         try {
-            console.log("📤 Envoi des données:", formData);
-
-            // ✅ On envoie SANS pseudo (ton backend le génère)
+            // ✅ Envoi au backend avec le pseudo
             const response = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prenom: formData.prenom,
-                    nom: formData.nom,
-                    email: formData.email,
-                    motDePasse: formData.motDePasse
-                    // Pas de pseudo, pas de role
-                }),
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
@@ -102,19 +82,16 @@ const SignUp = () => {
                 throw new Error(errorText || "Erreur lors de l'inscription");
             }
 
-            const data = await response.json();
-            console.log("✅ Inscription réussie:", data);
-
             setSuccess(true);
             
             // Redirection après 1.5 secondes
             setTimeout(() => {
-                navigate("/connexion");
+                navigate("/connexion"); // Ou /login selon ta route
             }, 1500);
 
         } catch (err) {
-            console.error("❌ Erreur complète:", err);
-            setError(err.message);
+            console.error("Erreur inscription:", err);
+            setError("Erreur : " + err.message);
         } finally {
             setLoading(false);
         }
@@ -150,7 +127,7 @@ const SignUp = () => {
                         onChange={handleChange}
                         type="text"
                         placeholder="Prénom"
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors text-white"
                         required
                         disabled={loading}
                     />
@@ -160,16 +137,23 @@ const SignUp = () => {
                         onChange={handleChange}
                         type="text"
                         placeholder="Nom"
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors text-white"
                         required
                         disabled={loading}
                     />
                 </div>
 
-                {/* ✅ INFO : Pseudo généré automatiquement */}
-                <div className="text-xs text-gray-500 -mt-2">
-                    💡 Votre pseudo sera : {formData.nom && formData.prenom ? `${formData.nom.toLowerCase()}.${formData.prenom.toLowerCase()}` : "nom.prenom"}
-                </div>
+                {/* Champ Pseudo réintégré avec ton style */}
+                <input
+                    name="pseudo"
+                    value={formData.pseudo}
+                    onChange={handleChange}
+                    type="text"
+                    placeholder="Pseudo"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors text-white"
+                    required
+                    disabled={loading}
+                />
 
                 <input
                     name="email"
@@ -177,7 +161,7 @@ const SignUp = () => {
                     onChange={handleChange}
                     type="email"
                     placeholder="Email"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors text-white"
                     required
                     disabled={loading}
                 />
@@ -187,8 +171,8 @@ const SignUp = () => {
                     value={formData.motDePasse}
                     onChange={handleChange}
                     type="password"
-                    placeholder="Mot de passe (min. 6 caractères)"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                    placeholder="Mot de passe"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors text-white"
                     required
                     disabled={loading}
                 />
